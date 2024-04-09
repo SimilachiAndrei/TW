@@ -1,0 +1,131 @@
+:root {
+    --c1: #E27D60;
+    --c2: #85dcb8;
+    --c3: #E8A87C;
+    --c4: #C38D9E;
+    --c5: #41B3A3;
+}
+
+html,
+body {
+    height: 100%;
+    margin: 0;
+    overflow-x: hidden;
+}
+
+body {
+    background-color: var(--c2);
+    overflow-x: hidden;
+}
+
+h1 {
+    color: white;
+}
+
+.container {
+    width: 100%;
+    height: 100%;
+    display: grid;
+    grid-template-columns: 60% 40%;
+}
+
+.image {
+    background-image: url('images/post.webp');
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+.form-container {
+    position: relative;
+    display: flex;
+    justify-content: center;
+}
+
+.post-box{
+    display: flex;
+    align-items: center;
+}
+
+.content-box {
+    position: relative;
+}
+
+.content-box input {
+    padding: 10px;
+    width: 100%;
+    border-radius: 10px;
+    border: none;
+    outline: none;
+}
+
+.content-box label {
+    position: absolute;
+    top: 50%;
+    left: 10px;
+    transform: translateY(-50%);
+    color: var(--c5);
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+}
+
+.content-box input:focus + label,
+.content-box input:valid + label {
+    opacity: 0;
+}
+
+
+.formular {
+    display: flex;
+}
+
+.content-box {
+    flex: 1; 
+    margin-right: 20px;
+}
+
+.post-button {
+    border: none;
+    background-color: transparent;
+    letter-spacing: 1px;
+    align-self: center;
+    cursor: pointer;
+    outline: none;
+    font-size: 1em;    
+    color: var(--c4);
+    transition: all 0.3s ease;
+    padding: 10px;
+}
+
+.post-button:hover {
+    background-color: var(--c4);
+    border-radius: 20px;
+    color: white;
+}
+
+@media only screen and (max-width: 50em) {
+    .container {
+        width: 100%;
+        height: auto;
+        display: flex;
+        position: relative;
+        flex-direction: column;
+        justify-content: center;
+        
+    }
+
+    .image {
+        width: 100%;
+        height: 100vw;
+        background-image: url('images/post.webp');
+        background-repeat: no-repeat;
+        background-size: cover;
+    }
+
+    .form-container {
+        display: flex;
+        justify-content: center;
+        order: 2;
+        border-radius: 20px;
+        margin-bottom: 100px;
+    }
+}
