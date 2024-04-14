@@ -28,13 +28,9 @@ body {
     justify-content: space-between;
     align-items: center;
     background-color: var(--c2);
-    padding: auto;
     flex-shrink: 0;
     z-index: 1000;
 
-    h2{
-        color: var(--c5)
-    }
 }
 
 .titlu {
@@ -299,6 +295,11 @@ body {
 
 h1{
     color: var(--c5)
+}
+
+
+h2{
+    color: var(--c5);
 }
 
 h3{
