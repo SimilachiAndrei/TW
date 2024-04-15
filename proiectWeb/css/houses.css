@@ -114,6 +114,10 @@ body {
     }
 }
 
+.ref{
+    display: none;
+}
+
 .oletter {
     display: inline-block;
     animation: spin 2s infinite linear;
@@ -274,7 +278,9 @@ body {
     .menu.active ul {
         display: flex;
     }
-
+    .ref{
+        display: block;
+    }
 }
 
 @media (max-width: 480px) {

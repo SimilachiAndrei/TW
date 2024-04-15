@@ -108,6 +108,10 @@ body {
     transition: transform 0.3s ease;
 }
 
+.ref{
+    display: none;
+}
+
 @keyframes spin {
     100% {
         transform: rotateY(360deg);
@@ -274,7 +278,9 @@ body {
     .menu.active ul {
         display: flex;
     }
-
+    .ref{
+        display: block;
+    }
 }
 
 @media (max-width: 480px) {
