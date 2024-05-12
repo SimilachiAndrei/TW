@@ -1,0 +1,25 @@
++ Este rsponsive
++ este valida
+
+
+Ar fi trebuit sa vad paginile urmatoare:
+- pagina de autentificare / create cont / recovery pass
+
+- pagina care permite introducere date firma
+- pagina profil (vizualizare) - PORTOFOLIU
+
+- pagina de incarcat proiectul tehnic (client)
+- posibilitatea de selectare firme a clientului
+- pagina de vizualizare a costurilor totale
+- pagina de rating
+
+- pagina de administrare pentru a filtra commenturile
+
+
+Pagina Scholarly este facuta ca sa fie.... nu vad acolo chestii relevante: functionalitatile voastre tin numai de autentificare si de setarile userului ?!
+
+Culorile (dupa parerea mea) sunt alese rau - nu prea inteleg cum vedeti voi bine culoare roz pe fond verde ?!
+
+
+-----------
+Concluzii: nota 7
