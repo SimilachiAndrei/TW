@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Page</title>
+    <link rel="stylesheet" href="css/admin.css">
+    <link rel="icon" type="image/x-icon" href="css/images/favicon.ico">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <a href="afterlog.html" class="titlu">Pla<div class="cletter">c<div class="image"></div>
+            </div><span class="oletter">o</span></a>
+        </div>
+        <div class="middle">
+            <div class="content">
+                <div class="admin-reviews" id="admin-reviews">
+                    <h2>Manage Reviews</h2>
+                    <div>
+                        <label for="filterCompany">Filter by Company:</label>
+                        <select id="filterCompany" name="filterCompany">
+                            <option value="">All Companies</option>
+                            <!-- Options will be populated dynamically -->
+                        </select>
+                    </div>
+                    <div id="adminReviewsList">
+                        <h3>All Reviews:</h3>
+                        <ul id="adminReviewItems"></ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="footer">
+            <p>Copyright &copy; Team PlaCo</p>
+        </div>
+    </div>
+    <script src="scripts/admin.js"></script>
+    <script src="scripts/circle.js"></script>
+    <script src="scripts/toggle.js"></script>
+</body>
+</html>
