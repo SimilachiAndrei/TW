@@ -1,22 +1,14 @@
-// userController.js
-
 const { parse } = require('cookie');
-
-const sessions = {};
-
-function generateSessionId() {
-    return Math.random().toString(36).substring(2);
-}
-
-
+const auth = require('../utils/auth');
 const userModel = require('../Models/userModel');
+const bcrypt = require('bcrypt');
 
-function signup(req, res) {
+async function signup(req, res) {
     let body = '';
     req.on('data', chunk => {
         body += chunk.toString();
     });
-    req.on('end', () => {
+    req.on('end', async () => {
         const formData = new URLSearchParams(body);
         const username = formData.get('username');
         const password = formData.get('password');
@@ -29,7 +21,8 @@ function signup(req, res) {
             return;
         }
 
-        if (userModel.getUser(username)) {
+        const userExists = await userModel.getUser(username);
+        if (userExists) {
             res.writeHead(400, { 'Content-Type': 'text/plain' });
             res.end('Username already exists');
             return;
@@ -37,9 +30,9 @@ function signup(req, res) {
 
         const userData = {
             username,
+            email,
             password,
-            userType,
-            email
+            role: userType // Assuming userType is 'admin', 'client', or 'company'
         };
 
         if (userType === 'company') {
@@ -60,36 +53,38 @@ function signup(req, res) {
             userData.companyProfile = companyProfile;
         }
 
-        userModel.addUser(userData);
+        await userModel.addUser(userData);
         res.writeHead(302, { 'Location': '/login' });
         res.end();
     });
 }
 
-function login(req, res) {
+async function login(req, res) {
     let body = '';
     req.on('data', chunk => {
         body += chunk.toString();
     });
 
-    req.on('end', () => {
+    req.on('end', async () => {
         const formData = new URLSearchParams(body);
         const username = formData.get('username');
         const password = formData.get('password');
+        
+        const user = await userModel.getUser(username);
 
-        const user = userModel.getUser(username);
-        if (!user || user.password !== password) {
-            res.writeHead(302, { 'Location': '/login' });
-            res.end();
-            return;
+        if (!user || !(await bcrypt.compare(password, user.password))) {
+            res.writeHead(400, { 'Content-Type': 'text/html' });
+            res.end(`
+            <script>alert('Invalid credentials!');</script>
+            <script>window.location.href = "/login";</script>
+          `); 
+          return;
         }
-
-        const sessionId = generateSessionId();
-        sessions[sessionId] = { username: user.username, userType: user.userType };
+        const token = auth.generateToken(user);
 
         res.writeHead(302, {
             'Location': '/afterlog',
-            'Set-Cookie': `sessionId=${sessionId}; HttpOnly`
+            'Set-Cookie': `token=${token}; HttpOnly; SameSite=Strict`
         });
         res.end();
     });
@@ -97,15 +92,51 @@ function login(req, res) {
 
 function isAuthenticated(req) {
     const cookies = parse(req.headers.cookie || '');
-    return sessions[cookies.sessionId];
+    const token = cookies.token;
+    const user = auth.verifyToken(token);
+    return user ? user : null;
+}
+
+function isUserType(req, type) {
+    const cookies = parse(req.headers.cookie || '');
+    const token = cookies.token;
+    const user = auth.verifyToken(token);
+    if(user.role === type) return true;
+    return false;
 }
 
 function logout(req, res) {
-    const cookies = parse(req.headers.cookie || '');
-    delete sessions[cookies.sessionId];
-
-    res.writeHead(302, { 'Location': '/login' });
+    res.writeHead(302, {
+        'Location': '/login',
+        'Set-Cookie': 'token=; HttpOnly; SameSite=Strict; Max-Age=0'
+    });
     res.end();
 }
 
-module.exports = { signup, login, isAuthenticated, logout };
+
+async function getUserData(req, res) {
+    const user = isAuthenticated(req);
+    if (!user) {
+        res.writeHead(401, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'Unauthorized' }));
+        return;
+    }
+
+    try {
+        const userData = await userModel.getAllUserData(user.username);
+        if (!userData) {
+            res.writeHead(404, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ error: 'User not found' }));
+            return;
+        }
+
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify(userData));
+    } catch (error) {
+        console.error('Error in userController.getUserData:', error);
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'Internal Server Error' }));
+    }
+}
+module.exports = { signup, login, isAuthenticated, logout, isUserType, getUserData };
+

@@ -2,6 +2,8 @@ const path = require('path');
 const fs = require('fs');
 
 const userController = require('../Controllers/userController');
+const myAccountController = require('../Controllers/myAccountController');
+const postController = require('../Controllers/postController');
 
 function handleRequest(req, res) {
     if (req.method === 'GET') {
@@ -54,6 +56,13 @@ function handleRequest(req, res) {
                     res.end();
                     return;
                 }
+                else if (userController.isUserType(req, "client") === false) {//PROBLEM : TODO
+                    res.setHeader('Content-Type', 'text/html');
+                    res.end(`
+                      <script>window.location.href = "/afterlog";</script>
+                    `);
+                    return;
+                }
                 filePath = path.join(__dirname, '..', '..', 'public', 'Contents', 'companies.html');
                 break;
             case '/houses':
@@ -72,6 +81,9 @@ function handleRequest(req, res) {
                 }
                 filePath = path.join(__dirname, '..', '..', 'public', 'Contents', 'instalatii.html');
                 break;
+            case '/api/user-data':
+                myAccountController.getUserData(req, res);
+                return;
             default:
                 filePath = path.join(__dirname, '..', '..', 'public', req.url);
         }
@@ -108,6 +120,10 @@ function handleRequest(req, res) {
             case '/login':
                 userController.login(req, res);
                 break;
+            case '/post':
+                postController.addPost(req, res);
+                break;
+
             default:
                 res.writeHead(404, { 'Content-Type': 'text/plain' });
                 res.end('Not Found');

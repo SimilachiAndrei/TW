@@ -1,13 +1,49 @@
-// userModel.js
+// src/Models/userModel.js
+const databaseManager = require('../Database/dbManager');
 
-let users = []; // Array to store user data
-
-function addUser(userData) {
-    users.push(userData);
+async function addUser(userData) {
+    try {
+        const user = await databaseManager.addUser(userData);
+        return user;
+    } catch (error) {
+        console.error('Error in userModel.addUser:', error);
+        throw error; // Re-throw to handle in your controller
+    }
 }
 
-function getUser(username) {
-    return users.find(user => user.username === username);
+async function addPost(postData, clientId) {
+    if (!clientId) {
+        throw new Error('Client ID is required to add a post');
+    }
+    
+    try {
+        const post = await databaseManager.addPost(postData, clientId);
+        return post;
+    } catch (error) {
+        console.error('Error in userModel.addPost:', error);
+        throw error;
+    }
 }
 
-module.exports = { addUser, getUser };
+async function getUser(username) {
+    try {
+        const user = await databaseManager.getUserByUsername(username);
+        return user;
+    } catch (error) {
+        console.error('Error in userModel.getUser:', error);
+        throw error; 
+    }
+}
+
+
+async function getAllUserData(username) {
+    try {
+        const userData = await databaseManager.getAllUserData(username);
+        return userData;
+    } catch (error) {
+        console.error('Error in userModel.getAllUserData:', error);
+        throw error;
+    }
+}
+
+module.exports = { addUser, getUser, getAllUserData, addPost }; // Ensure getAllUserData is exported

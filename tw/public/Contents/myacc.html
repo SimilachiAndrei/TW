@@ -71,8 +71,47 @@
             <p>Copyright &copy; Team PlaCo</p>
         </div>
     </div>
-    <script src="/Contents/scripts/circle.js"></script>
+    <!-- <script src="/Contents/scripts/circle.js"></script> -->
     <script src="/Contents/scripts/toggle.js"></script>
+
+<!-- <script>
+  const xhr = new XMLHttpRequest();
+  xhr.open('GET', '/api/user-data', true);
+
+  xhr.onload = function() {
+    if (xhr.status === 200) {
+      const data = JSON.parse(xhr.responseText);
+      // Update the HTML content with the retrieved data
+      const postContainer = document.querySelector('.post-container');
+      postContainer.innerHTML = '';
+
+      data.posts.forEach(post => {
+        const postItem = document.createElement('div');
+        postItem.classList.add('post-item');
+        postItem.innerHTML = `
+          <h3>${post.title}</h3>
+          <h4>Status: ${post.status}</h4>
+          <img src="${post.imageUrl}" alt="${post.title}">
+          <div class="description">
+            Description
+            <div class="descontent">${post.description}</div>
+          </div>
+        `;
+        postContainer.appendChild(postItem);
+      });
+
+      // Update other user information as needed
+    } else {
+      console.error('Error fetching user data:', xhr.status);
+    }
+  };
+
+  xhr.onerror = function() {
+    console.error('Error fetching user data');
+  };
+
+  xhr.send();
+</script> -->
 </body>
 
 </html>
