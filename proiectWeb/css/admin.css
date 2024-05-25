@@ -1,0 +1,217 @@
+:root {
+    --c1: #E27D60;
+    --c2: #85dcb8;
+    --c3: #E8A87C;
+    --c4: #C38D9E;
+    --c5: #41B3A3;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-size: 16px;
+    overflow-x: hidden;
+}
+
+.container {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content:center;
+    align-items: center;
+    background-color: var(--c2);
+    flex-shrink: 0;
+    z-index: 1000;
+}
+
+.titlu {
+    text-decoration: none;
+    margin: 0;
+    text-align: center;
+    color: white;
+    font-family: sans-serif;
+    font-size: 3rem;
+
+}
+
+.menu {
+    margin-top: 20px;
+}
+
+.menu ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+}
+
+.menu ul li {
+    margin-left: 20px;
+    margin-bottom: 10px;
+}
+
+.menu ul li a {
+    text-decoration: none;
+    color: var(--c4);
+    padding: 10px 15px;
+    transition: background-color 0.3s ease;
+}
+
+.menu ul li a:hover {
+    background-color: #f0f0f0;
+    border-radius: 5px;
+}
+
+.menu-toggle {
+    display: none;
+    cursor: pointer;
+}
+
+.menu-toggle span {
+    display: block;
+    width: 25px;
+    height: 3px;
+    background-color: #333;
+    margin-bottom: 5px;
+    transition: transform 0.3s ease;
+}
+
+@keyframes spin {
+    100% {
+        transform: rotateY(360deg);
+    }
+}
+
+.oletter {
+    display: inline-block;
+    animation: spin 2s infinite linear;
+    transform-origin: center;
+}
+
+.cletter {
+    position: relative;
+    display: inline-block;
+}
+
+.image {
+    width: 0.6em;
+    height: 0.6em;
+    background-image: url('images/helmet.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    position: absolute;
+    top: 0.2em;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.footer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: var(--c3);
+    padding: 0.1rem;
+    flex-shrink: 0;
+}
+
+.middle {
+    background: linear-gradient(-45deg, var(--c5), var(--c4));
+    flex-grow: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-top: 80px;
+}
+
+.content {
+    text-align: center;
+    background-color: rgba(255, 255, 255, 0.8);
+    padding: 1rem;
+    border-radius: 10px;
+    width: 100%;
+    max-width: 800px;
+}
+
+.admin-reviews {
+    margin-top: 2rem;
+}
+
+.admin-reviews label {
+    color: var(--c5);
+}
+
+.admin-reviews select {
+    padding: 0.5rem;
+    margin-bottom: 1rem;
+    border: 1px solid var(--c4);
+    border-radius: 5px;
+}
+
+#adminReviewItems {
+    list-style: none;
+    padding: 0;
+}
+
+#adminReviewItems li {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+    display: flex;
+    justify-content: space-between;
+    text-align: left;
+    align-items: center;
+}
+
+#adminReviewItems li strong {
+    color: var(--c1);
+}
+
+h2 {
+    color: var(--c5);
+}
+
+h3 {
+    color: var(--c1);
+    text-align: left;
+}
+
+.admin-buttons {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.admin-buttons button {
+    padding: 0.5rem 1rem;
+    border: none;
+    outline: none;
+    border-radius: 5px;
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+.admin-buttons .approve {
+    background-color: var(--c5);
+    color: white;
+}
+
+.admin-buttons .reject {
+    background-color: var(--c1);
+    color: white;
+}
+
+.admin-buttons .approve:hover {
+    background-color: var(--c4);
+}
+
+.admin-buttons .reject:hover {
+    background-color: var(--c3);
+}
