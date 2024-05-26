@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Review Page</title>
+    <link rel="stylesheet" href="css/review.css">
+    <link rel="icon" type="image/x-icon" href="css/images/favicon.ico">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <nav class="menu">
+                <ul>
+                    <li><a href="myacc.html">My Account</a></li>
+                    <li><a href="companies.html">Companies</a></li>
+                    <li><a href="about.html">About</a></li>
+                </ul>
+                <div class="menu-toggle">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </nav>
+            <a href="afterlog.html" class="titlu">Pla<div class="cletter">c<div class="image"></div></div><span class="oletter">o</span></a>
+        </div>
+        <div class="middle">
+            <div class="content">
+                <div class="reviews" id="reviews">
+                    <h2>Leave a Review:</h2>
+                    <form id="reviewForm">
+                        <div>
+                            <label for="companyName">Company Name:</label>
+                            <select id="companyName" name="companyName" required>
+                                <option value="">Select a company</option>
+                                
+                            </select>
+                        </div>
+                        <div>
+                            <label for="rating">Rating:</label>
+                            <select id="rating" name="rating" required>
+                                <option value="">Select rating</option>
+                                <option value="5">5 - Excellent</option>
+                                <option value="4">4 - Very Good</option>
+                                <option value="3">3 - Good</option>
+                                <option value="2">2 - Fair</option>
+                                <option value="1">1 - Poor</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="comments">Comments:</label>
+                            <textarea id="comments" name="comments" required></textarea>
+                        </div>
+                        <div>
+                            <label for="photos">Add Photos:</label>
+                            <input type="file" id="photos" name="photos" accept="image/*" multiple>
+                        </div>
+                        <button type="submit">Submit Review</button>
+                    </form>
+                    <div class="view-reviews">
+                        <h3>View Reviews for a Company:</h3>
+                        <div>
+                            <select id="selectCompanyReviews" name="selectCompanyReviews">
+                                <option value="">Select a company</option>
+                                <!-- Options will be populated dynamically -->
+                            </select>
+                            <button id="viewReviewsButton">View Reviews</button>
+                        </div>
+                    </div>
+                    <div id="reviewsList">
+                        <h3>Client Reviews:</h3>
+                        <ul id="reviewItems"></ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="footer">
+            <p>Copyright &copy; Team PlaCo</p>
+        </div>
+    </div>
+    <script src="scripts/reviews.js"></script>
+    <script src="scripts/circle.js"></script>
+    <script src="scripts/toggle.js"></script>
+</body>
+</html>
