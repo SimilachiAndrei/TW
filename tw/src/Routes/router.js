@@ -4,6 +4,7 @@ const fs = require('fs');
 const userController = require('../Controllers/userController');
 const myAccountController = require('../Controllers/myAccountController');
 const postController = require('../Controllers/postController');
+const companiesController = require('../Controllers/companiesController');
 
 function handleRequest(req, res) {
     if (req.method === 'GET') {
@@ -84,6 +85,14 @@ function handleRequest(req, res) {
             case '/api/user-data':
                 myAccountController.getUserData(req, res);
                 return;
+            case '/api/role':
+                const role = userController.getUserType(req,res);
+                res.writeHead(200, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ role }));
+                return;
+            case '/api/companies':
+                companiesController.getCompanies(req,res);
+                return;
             default:
                 filePath = path.join(__dirname, '..', '..', 'public', req.url);
         }
@@ -123,7 +132,9 @@ function handleRequest(req, res) {
             case '/post':
                 postController.addPost(req, res);
                 break;
-
+            case '/api/motto':
+                companiesController.addMotto(req,res);
+                break;
             default:
                 res.writeHead(404, { 'Content-Type': 'text/plain' });
                 res.end('Not Found');

@@ -6,7 +6,13 @@ const generateToken = (user) => {
 };
 
 const verifyToken = (token) => {
-    return jwt.verify(token, secretKey);
+    try {
+        return jwt.verify(token, secretKey);
+    } catch (error) {
+        // Token verification failed
+        console.error('Error verifying token:', error);
+        return null; 
+    }
 };
 
 

@@ -65,43 +65,66 @@ async function addPost(postData, clientId) {
         throw new Error('Client ID is required');
     }
 
+    const { projectName, description, ...phasesObj } = postData;
+
     try {
-        const { projectName, description } = postData; // Extract necessary fields
+        // Insert project
         const result = await pool.query(
             'INSERT INTO projects (client_id, project_name, description) VALUES ($1, $2, $3) RETURNING *',
             [clientId, projectName, description]
         );
+
+        const projectId = result.rows[0].id; // Get the newly created project ID
+
+        const phaseList = Object.values(phasesObj);
+
+        // Insert phases
+        for (const phase of phaseList) {
+            await pool.query(
+                'INSERT INTO phases (project_id, description) VALUES ($1, $2)',
+                [projectId, phase]
+            );
+        }
+
         return result.rows[0];
     } catch (error) {
         console.error('Error adding post:', error);
         throw error;
     }
 }
+
+
+
 //TO DO later for my account and other stuff
 const getAllUserData = async (username) => {
     const query = `
         SELECT 
-            u.id, 
+            u.id AS user_id, 
             u.username, 
             u.email, 
             u.role,
-            c.additional_data,
+            p.id AS project_id,
+            p.project_name,
+            p.description AS project_description,
+            ph.id AS phase_id,
+            ph.description AS phase_description,
+            ph.start_date,
+            ph.end_date,
+            ph.company_id,
             co.company_name,
             co.company_address,
             co.company_phone,
-            co.company_profile,
-            p.project_name,
-            p.description,
-            p.start_date,
-            p.end_date
+            co.company_profile
         FROM 
             users u
         LEFT JOIN 
-            clients c ON u.id = c.user_id
+            clients c ON c.user_id = u.id
         LEFT JOIN 
-            companies co ON u.id = co.user_id
+            projects p ON p.client_id = c.user_id
         LEFT JOIN 
-            projects p ON co.id = p.company_id
+            phases ph ON ph.project_id = p.id
+        LEFT JOIN 
+            companies co ON co.id = ph.company_id
         WHERE 
             u.username = $1;
     `;
@@ -109,12 +132,110 @@ const getAllUserData = async (username) => {
 
     try {
         const result = await pool.query(query, values);
-        return result.rows[0];
+        const userData = {
+            user: {
+                id: result.rows[0].user_id,
+                username: result.rows[0].username,
+                email: result.rows[0].email,
+                role: result.rows[0].role
+            },
+            projects: result.rows.reduce((projects, row) => {
+                let project = projects.find(project => project.id === row.project_id);
+                if (!project) {
+                    project = {
+                        id: row.project_id,
+                        name: row.project_name,
+                        description: row.project_description,
+                        phases: []
+                    };
+                    projects.push(project);
+                }
+                if (row.phase_id) {
+                    project.phases.push({
+                        id: row.phase_id,
+                        description: row.phase_description,
+                        startDate: row.start_date,
+                        endDate: row.end_date,
+                        company: row.company_id ? {
+                            id: row.company_id,
+                            name: row.company_name,
+                            address: row.company_address,
+                            phone: row.company_phone,
+                            profile: row.company_profile
+                        } : null
+                    });
+                }
+                return projects;
+            }, [])
+        };
+        return userData;
     } catch (error) {
         console.error('Error retrieving all user data:', error);
         throw error;
     }
 };
 
+const getCompanies = async () => {
+    const query = `
+        SELECT 
+            co.id AS company_id,
+            co.company_name,
+            co.company_address,
+            co.company_phone,
+            co.company_profile,
+            i.id AS image_id,
+            i.name AS image_name,
+            i.data AS image_data
+        FROM 
+            companies co
+        LEFT JOIN 
+            images i ON i.profile_picture = co.id;
+    `;
 
-module.exports = { getUserByUsername, addUser, getAllUserData, addPost };
+    try {
+        const result = await pool.query(query);
+        const companiesData = result.rows.map(row => ({
+            company: {
+                id: row.company_id,
+                name: row.company_name,
+                address: row.company_address,
+                phone: row.company_phone,
+                profile: row.company_profile
+            },
+            image: {
+                id: row.image_id,
+                name: row.image_name,
+                data: row.image_data
+            }
+        }));
+        return companiesData;
+    } catch (error) {
+        console.error('Error retrieving company data:', error);
+        throw error;
+    }
+};
+
+async function addMotto(userData, id) {
+    try {
+        const motto = userData['new-motto'];
+        
+        // Update the companies table with the motto
+        const result = await pool.query(
+            'UPDATE companies SET motto = $1 WHERE user_id = $2 RETURNING id',
+            [motto, id]
+        );
+
+        const companyId = result.rows[0].id; // Get the updated company ID
+
+        // Return the updated company information
+        return result.rows[0];
+    } catch (error) {
+        console.error('Error adding motto:', error);
+        throw error;
+    }
+}
+
+
+
+
+module.exports = { getUserByUsername, addUser, getAllUserData, addPost, getCompanies, addMotto };

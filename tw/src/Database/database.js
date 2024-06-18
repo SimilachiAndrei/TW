@@ -44,7 +44,7 @@ const databaseInitialization = async (pool) => {
         "company_profile" TEXT,
         "motto" TEXT,
         "description" TEXT
-    );`;
+    );`; //profile picture
 
         const createProjectsTableQuery = `
     CREATE TABLE IF NOT EXISTS "projects"
@@ -63,7 +63,7 @@ const databaseInitialization = async (pool) => {
         "description" TEXT,
         "start_date"  DATE,
         "end_date"    DATE,
-        "company_id"  INTEGER NOT NULL REFERENCES companies(user_id) ON DELETE CASCADE,
+        "company_id"  INTEGER REFERENCES companies(user_id) ON DELETE CASCADE,
         "price"       NUMERIC(10, 2)
     );`;
 
@@ -71,9 +71,10 @@ const databaseInitialization = async (pool) => {
     CREATE TABLE IF NOT EXISTS "images"
     (
         "id"          SERIAL PRIMARY KEY,
-        "phase_id"    INTEGER NOT NULL REFERENCES phases(id) ON DELETE CASCADE,
+        "phase_id"    INTEGER REFERENCES phases(id) ON DELETE CASCADE,
         "name"        VARCHAR(255) NOT NULL,
-        "data"        BYTEA
+        "data"        BYTEA,
+        "profile_picture" INTEGER REFERENCES users(id) ON DELETE CASCADE
     );`;
 
         const createReviewTableQuery = `

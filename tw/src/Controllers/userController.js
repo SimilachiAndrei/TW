@@ -105,6 +105,13 @@ function isUserType(req, type) {
     return false;
 }
 
+function getUserType(req, type) {
+    const cookies = parse(req.headers.cookie || '');
+    const token = cookies.token;
+    const user = auth.verifyToken(token);
+    return user.role;
+}
+
 function logout(req, res) {
     res.writeHead(302, {
         'Location': '/login',
@@ -138,5 +145,5 @@ async function getUserData(req, res) {
         res.end(JSON.stringify({ error: 'Internal Server Error' }));
     }
 }
-module.exports = { signup, login, isAuthenticated, logout, isUserType, getUserData };
+module.exports = { signup, login, isAuthenticated, logout, isUserType, getUserData, getUserType };
 
