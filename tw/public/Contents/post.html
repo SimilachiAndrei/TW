@@ -12,7 +12,8 @@
 <body>
     <div class="container">
         <div class="form-container">
-            <a href="/afterlog" class="titlu">Pla<div class="cletter">c<div class="hat"></div></div><span class="oletter">o</span></a>
+            <a href="/afterlog" class="titlu">Pla<div class="cletter">c<div class="hat"></div>
+                </div><span class="oletter">o</span></a>
             <div class="post-box">
                 <div>
                     <h1>Describe your project</h1>
@@ -35,33 +36,34 @@
     </div>
     <script>
         let phaseIndex = 1;
-    
+
         // JavaScript function to add a new content-box
-        document.getElementById('add-content-box').addEventListener('click', function() {
+        document.getElementById('add-content-box').addEventListener('click', function () {
             // Create a new div element with class 'content-box'
             var newContentBox = document.createElement('div');
             newContentBox.classList.add('content-box');
-    
+
             // Create a new input element
             var newInput = document.createElement('input');
             newInput.type = 'text';
-            newInput.name = 'phase' + phaseIndex;
+            newInput.name = 'phases[' + phaseIndex + ']'; // Use an index in the name
             newInput.required = true;
-    
+
             // Create a new label element
             var newLabel = document.createElement('label');
             newLabel.textContent = 'Phase ' + phaseIndex;
-    
+
             // Append the input and label to the new content-box div
             newContentBox.appendChild(newInput);
             newContentBox.appendChild(newLabel);
-    
+
             // Append the new content-box to the form
             var form = document.querySelector('.formular');
             form.insertBefore(newContentBox, document.getElementById('add-content-box'));
-    
+
             phaseIndex++;
         });
+
     </script>
 </body>
 

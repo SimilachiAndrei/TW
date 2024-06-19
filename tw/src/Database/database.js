@@ -72,9 +72,9 @@ const databaseInitialization = async (pool) => {
     (
         "id"          SERIAL PRIMARY KEY,
         "phase_id"    INTEGER REFERENCES phases(id) ON DELETE CASCADE,
-        "name"        VARCHAR(255) NOT NULL,
+        "name"        VARCHAR(255),
         "data"        BYTEA,
-        "profile_picture" INTEGER REFERENCES users(id) ON DELETE CASCADE
+        "profile_picture" INTEGER UNIQUE REFERENCES users(id) ON DELETE CASCADE
     );`;
 
         const createReviewTableQuery = `

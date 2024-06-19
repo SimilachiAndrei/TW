@@ -13,7 +13,8 @@
     <div class="container">
         <div class="header">
             <nav class="menu">
-                <ul>
+                <ul id="menu-list">
+                    <!-- Menu items to be dynamically adjusted -->
                     <li><a href="/companies">Companies</a></li>
                     <li><a href="/myacc">My Account</a></li>
                     <li><a href="/about">About</a></li>
@@ -26,11 +27,11 @@
             </nav>
 
             <div class="buttons">
-                <button class="post" onclick="location.href = '/post';">Post</button>
+                <!-- Buttons to be dynamically adjusted -->
             </div>
 
-            <a href="/afterlog" class="titlu">Pla<div class="cletter">c<div class="image"></div></div><span
-                    class="oletter">o</span></a>
+            <a href="/afterlog" class="titlu">Pla<div class="cletter">c<div class="image"></div>
+                </div><span class="oletter">o</span></a>
 
         </div>
         <div class="middle">
@@ -43,7 +44,7 @@
                 </div>
                 <div class="construct2">
                     <h3>Building in Abu Dhabi owned by a sheikh</h3>
-                        <img src="/Contents/css/images/constlog.webp" alt="Building in Abu Dhabi">
+                    <img src="/Contents/css/images/constlog.webp" alt="Building in Abu Dhabi">
                 </div>
                 <div class="reviews">
                     <h2>Reviews from our clients:</h2>
@@ -78,8 +79,58 @@
             <p>Copyright &copy; Team PlaCo</p>
         </div>
     </div>
-    <script src="/Contents/scripts/circle.js"></script>
     <script src="/Contents/scripts/toggle.js"></script>
+    <script>
+        // Fetch user role from server
+        fetch('/api/role')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                const userRole = data.role;
+                const menuList = document.getElementById('menu-list');
+                const buttonsContainer = document.querySelector('.buttons');
+
+                if (userRole === 'client') {
+                    // Adjust menu items and buttons for client
+                    // Add Licitations link to menu
+                    const licitationsItem = document.createElement('li');
+                    licitationsItem.innerHTML = '<a href="/myLicitations">Licitations</a>';
+                    menuList.appendChild(licitationsItem);
+                    const postButton = document.createElement('button');
+                    postButton.className = 'post';
+                    postButton.textContent = 'Post';
+                    postButton.onclick = function () {
+                        location.href = '/post';
+                    };
+                    buttonsContainer.appendChild(postButton);
+
+                } else if (userRole === 'company') {
+                    // Adjust menu items and buttons for company
+                    const companiesLink = menuList.querySelector('a[href="/companies"]');
+                    if (companiesLink) {
+                        companiesLink.parentNode.remove(); // Remove Companies link for companies
+                    }
+
+                    // Change 'Post' button to 'Licitate' button
+                    const licitateButton = document.createElement('button');
+                    licitateButton.className = 'post'; // Correct class name to 'post'
+                    licitateButton.textContent = 'Licitate'; // Set button text content to 'Licitate'
+                    licitateButton.onclick = function () {
+                        location.href = '/licitate';
+                    };
+                    buttonsContainer.appendChild(licitateButton); // Append the correct button element
+                }
+
+            })
+            .catch(error => {
+                console.error('Error fetching user role:', error);
+            });
+
+    </script>
 </body>
 
 </html>

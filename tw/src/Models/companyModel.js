@@ -2,7 +2,7 @@ const databaseManager = require('../Database/dbManager'); // Ensure the correct 
 
 async function getCompanies(req, res) {
     try {
-        const companiesData = await companyModel.getCompanies();
+        const companiesData = await databaseManager.getCompanies();
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify(companiesData));
     } catch (error) {
@@ -12,9 +12,9 @@ async function getCompanies(req, res) {
     }
 }
 
-async function addMotto(data,id) {
+async function addMotto(data, id) {
     try {
-        const response = await databaseManager.addMotto(data,id);
+        const response = await databaseManager.addMotto(data, id);
         return response;
     } catch (error) {
         console.error('Error in companyModel.addMotto:', error);
@@ -22,4 +22,28 @@ async function addMotto(data,id) {
     }
 }
 
-module.exports = { getCompanies, addMotto };
+async function getCompany(id) {
+    try {
+        const response = await databaseManager.getCompany(id);
+        return response;
+    } catch (error) {
+        console.error('Error in companyModel.addMotto:', error);
+        throw error; // Re-throw to handle in your controller
+    }
+}
+
+async function updateOrInsertProfilePicture
+    (userId, fileName, imageData) {
+        try {
+            const response = await databaseManager.updateOrInsertProfilePicture(userId, fileName, imageData);
+            return response;
+        } catch (error) {
+            console.error('Error in companyModel.addMotto:', error);
+            throw error; // Re-throw to handle in your controller
+        }
+}
+
+
+
+
+module.exports = { getCompanies, addMotto, getCompany, updateOrInsertProfilePicture };

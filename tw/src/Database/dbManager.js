@@ -2,6 +2,7 @@
 
 const { Pool } = require('pg');
 const bcrypt = require('bcrypt');
+// const { getCompany } = require('../Models/companyModel');
 
 const pool = new Pool({
     user: 'web',
@@ -31,9 +32,9 @@ async function addUser(userData) {
             throw new Error("Role is required");
         }
 
-        const hashedPassword = await bcrypt.hash(password, 10); 
+        const hashedPassword = await bcrypt.hash(password, 10);
         const result = await pool.query(
-            'INSERT INTO users (username, email, password, role) VALUES ($1, $2, $3, $4) RETURNING *', 
+            'INSERT INTO users (username, email, password, role) VALUES ($1, $2, $3, $4) RETURNING *',
             [username, email, hashedPassword, role]
         );
 
@@ -56,7 +57,7 @@ async function addUser(userData) {
         return result.rows[0];
     } catch (error) {
         console.error('Error adding user:', error);
-        throw error; 
+        throw error;
     }
 }
 
@@ -217,8 +218,13 @@ const getCompanies = async () => {
 
 async function addMotto(userData, id) {
     try {
-        const motto = userData['new-motto'];
-        
+        // Parse userData to extract the motto property
+        const data = JSON.parse(Object.keys(userData)[0]); // Parse the first key (which is the JSON string)
+
+        const motto = data.motto; // Extract the motto property
+
+        console.log('Received motto:', motto);
+
         // Update the companies table with the motto
         const result = await pool.query(
             'UPDATE companies SET motto = $1 WHERE user_id = $2 RETURNING id',
@@ -235,7 +241,75 @@ async function addMotto(userData, id) {
     }
 }
 
+async function updateOrInsertProfilePicture(userId, fileData) {
+    try {
+        const query = `
+            INSERT INTO images (profile_picture, data)
+            VALUES ($1, $2)
+            ON CONFLICT (profile_picture) DO UPDATE
+            SET data = EXCLUDED.data
+        `;
+        const values = [userId, fileData];
+        await pool.query(query, values);
+    } catch (error) {
+        console.error('Error in companyModel.updateOrInsertProfilePicture:', error);
+        throw error;
+    }
+}
+
+
+async function getCompany(id) {
+    const query = `
+        SELECT 
+            co.company_name,
+            co.company_address,
+            co.company_phone,
+            co.company_profile,
+            co.motto,
+            co.description,
+            i.id AS image_id,
+            i.name AS image_name,
+            i.data AS image_data
+        FROM 
+            companies co
+        LEFT JOIN 
+            images i ON i.profile_picture = co.user_id
+        WHERE 
+            co.user_id = $1;
+    `;
+
+    try {
+        const result = await pool.query(query, [id]);
+        if (result.rows.length === 0) {
+            throw new Error(`Company with id ${id} not found`);
+        }
+
+        const row = result.rows[0];
+        const companyData = {
+            company: {
+                id: row.company_id,
+                name: row.company_name,
+                address: row.company_address,
+                phone: row.company_phone,
+                profile: row.company_profile,
+                motto: row.motto,
+                description: row.description
+            },
+            image: {
+                id: row.image_id,
+                name: row.image_name,
+                data: row.image_data,
+            },
+        };
+
+        return companyData;
+    } catch (error) {
+        console.error('Error retrieving company data:', error);
+        throw error;
+    }
+}
 
 
 
-module.exports = { getUserByUsername, addUser, getAllUserData, addPost, getCompanies, addMotto };
+module.exports = { getUserByUsername, addUser, getAllUserData, addPost, 
+    getCompanies, addMotto, getCompany, updateOrInsertProfilePicture };

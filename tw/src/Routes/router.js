@@ -5,6 +5,8 @@ const userController = require('../Controllers/userController');
 const myAccountController = require('../Controllers/myAccountController');
 const postController = require('../Controllers/postController');
 const companiesController = require('../Controllers/companiesController');
+const multer = require('multer');
+const upload = multer({ dest: 'uploads/' });
 
 function handleRequest(req, res) {
     if (req.method === 'GET') {
@@ -86,12 +88,15 @@ function handleRequest(req, res) {
                 myAccountController.getUserData(req, res);
                 return;
             case '/api/role':
-                const role = userController.getUserType(req,res);
+                const role = userController.getUserType(req, res);
                 res.writeHead(200, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({ role }));
                 return;
             case '/api/companies':
-                companiesController.getCompanies(req,res);
+                companiesController.getCompanies(req, res);
+                return;
+            case '/api/company':
+                companiesController.getCompany(req, res);
                 return;
             default:
                 filePath = path.join(__dirname, '..', '..', 'public', req.url);
@@ -132,14 +137,34 @@ function handleRequest(req, res) {
             case '/post':
                 postController.addPost(req, res);
                 break;
-            case '/api/motto':
-                companiesController.addMotto(req,res);
+            default:
+                res.writeHead(404, { 'Content-Type': 'text/plain' });
+                res.end('Not Found');
+        }
+
+    }
+    else if (req.method === 'PUT') {
+        switch (req.url) {
+            case '/api/company/motto':
+                companiesController.addMotto(req, res);
+                break;
+            case '/api/company/profile-picture':
+                upload.single('profilePicture')(req, res, function (err) {
+                    if (err) {
+                        console.error('Error in file upload:', err);
+                        res.writeHead(500, { 'Content-Type': 'application/json' });
+                        res.end(JSON.stringify({ error: 'Internal Server Error' }));
+                        return;
+                    }
+                    companiesController.updateProfilePicture(req, res);
+                });
                 break;
             default:
                 res.writeHead(404, { 'Content-Type': 'text/plain' });
                 res.end('Not Found');
         }
-    } else {
+    }
+    else {
         res.writeHead(405, { 'Content-Type': 'text/plain' });
         res.end('Method Not Allowed');
     }
