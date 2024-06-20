@@ -82,8 +82,8 @@ async function addPost(postData, clientId) {
         // Insert phases
         for (const phase of phaseList) {
             await pool.query(
-                'INSERT INTO phases (project_id, description) VALUES ($1, $2)',
-                [projectId, phase]
+                'INSERT INTO phases (project_id, description,state) VALUES ($1, $2,$3)',
+                [projectId, phase, 'notpending']
             );
         }
 
@@ -93,6 +93,73 @@ async function addPost(postData, clientId) {
         throw error;
     }
 }
+
+async function addLicitation(postData, clientId) {
+    if (!clientId) {
+        throw new Error('Client ID is required');
+    }
+
+    try {
+        const jsonString = Object.keys(postData)[0]; // Get the JSON string key
+        const data = JSON.parse(jsonString); // Parse the JSON string into an object
+        const id = data.phaseId; // Access the id from the parsed object
+
+        // Assuming you have a pool for database queries
+        const result = await pool.query(
+            'UPDATE phases SET state = $1 WHERE id = $2',
+            ['pending', id]
+        );
+
+        return result.rows[0]; // Return the updated row
+    } catch (error) {
+        console.error('Error adding post:', error);
+        throw error; // Throw error to handle it upstream
+    }
+}
+
+// Assuming you have a database connection pool initialized (e.g., 'pool')
+
+async function addOffer(data, companyId) {
+    const jsonString = Object.keys(data)[0]; // Get the JSON string key
+    const dates = JSON.parse(jsonString); // Parse the JSON string into an object
+    const { phase_id, start_date, end_date, price } = dates;
+    console.log(data);
+    console.log(phase_id);
+    try {
+        // Check if the phase exists and its state is 'pending'
+        const phaseQuery = 'SELECT state FROM phases WHERE id = $1';
+        const phaseResult = await pool.query(phaseQuery, [phase_id]);
+
+        if (phaseResult.rows.length === 0) {
+            throw new Error('Phase not found');
+        }
+
+        const phaseState = phaseResult.rows[0].state;
+
+        if (phaseState !== 'pending') {
+            throw new Error('Cannot add offer for phases with state other than pending');
+        }
+
+        // Insert the offer into the offers table
+        const insertQuery = `
+            INSERT INTO offers (phase_id, start_date, end_date, company_id, price)
+            VALUES ($1, $2, $3, $4, $5)
+            RETURNING id`;
+        
+        const values = [phase_id, start_date, end_date, companyId, price];
+        const result = await pool.query(insertQuery, values);
+
+        return { offerId: result.rows[0].id };
+    } catch (error) {
+        console.error('Error adding offer:', error);
+        throw error; // Re-throw the error to be handled in the controller
+    }
+}
+
+module.exports = {
+    addOffer,
+};
+
 
 
 
@@ -111,6 +178,7 @@ const getAllUserData = async (username) => {
             ph.description AS phase_description,
             ph.start_date,
             ph.end_date,
+            ph.state,
             ph.company_id,
             co.company_name,
             co.company_address,
@@ -157,6 +225,7 @@ const getAllUserData = async (username) => {
                         description: row.phase_description,
                         startDate: row.start_date,
                         endDate: row.end_date,
+                        state: row.state,
                         company: row.company_id ? {
                             id: row.company_id,
                             name: row.company_name,
@@ -190,7 +259,7 @@ const getCompanies = async () => {
         FROM 
             companies co
         LEFT JOIN 
-            images i ON i.profile_picture = co.id;
+            images i ON i.profile_picture = co.user_id;
     `;
 
     try {
@@ -244,12 +313,12 @@ async function addMotto(userData, id) {
 async function updateOrInsertProfilePicture(userId, fileData) {
     try {
         const query = `
-            INSERT INTO images (profile_picture, data)
-            VALUES ($1, $2)
+            INSERT INTO images (name, profile_picture, data)
+            VALUES ($1, $2, $3)
             ON CONFLICT (profile_picture) DO UPDATE
             SET data = EXCLUDED.data
         `;
-        const values = [userId, fileData];
+        const values = ['profile', userId, fileData];
         await pool.query(query, values);
     } catch (error) {
         console.error('Error in companyModel.updateOrInsertProfilePicture:', error);
@@ -309,7 +378,41 @@ async function getCompany(id) {
     }
 }
 
+// select * from phases ph join projects pr on ph.project_id = pr.id join users u on pr.client_id=u.id;
 
+const getAvailableLicitations = async () => {
+    const query = `
+        SELECT
+            ph.id,
+            ph.project_id,
+            ph.description,
+            ph.start_date,
+            ph.end_date,
+            ph.state,
+            ph.company_id,
+            ph.price,
+            u.username,
+            u.id AS user_id,
+            pr.project_name
+        FROM
+            phases ph
+            join projects pr on ph.project_id = pr.id 
+            join users u on pr.client_id=u.id
+        WHERE
+            ph.state = 'pending'
+    `;
 
-module.exports = { getUserByUsername, addUser, getAllUserData, addPost, 
-    getCompanies, addMotto, getCompany, updateOrInsertProfilePicture };
+    try {
+        const result = await pool.query(query);
+        return result.rows;
+    } catch (error) {
+        console.error('Error retrieving available licitations:', error);
+        throw error;
+    }
+};
+
+module.exports = {
+    getUserByUsername, addUser, getAllUserData, addPost,
+    getCompanies, addMotto, getCompany, updateOrInsertProfilePicture, addLicitation,
+    getAvailableLicitations, addOffer
+};

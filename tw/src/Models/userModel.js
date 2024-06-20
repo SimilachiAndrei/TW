@@ -25,6 +25,20 @@ async function addPost(postData, clientId) {
     }
 }
 
+async function addLicitation(postData, clientId) {
+    if (!clientId) {
+        throw new Error('Client ID is required to add a post');
+    }
+    
+    try {
+        const post = await databaseManager.addLicitation(postData, clientId);
+        return post;
+    } catch (error) {
+        console.error('Error in userModel.addLicitation:', error);
+        throw error;
+    }
+}
+
 async function getUser(username) {
     try {
         const user = await databaseManager.getUserByUsername(username);
@@ -46,4 +60,4 @@ async function getAllUserData(username) {
     }
 }
 
-module.exports = { addUser, getUser, getAllUserData, addPost }; // Ensure getAllUserData is exported
+module.exports = { addUser, getUser, getAllUserData, addPost, addLicitation }; // Ensure getAllUserData is exported

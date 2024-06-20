@@ -77,11 +77,11 @@
                             const postContainer = document.createElement('div');
                             postContainer.classList.add('middle');
                             postContainer.innerHTML = `
-                        <div id="client-posts" class="content">
-                            <h1>Your Posts:</h1>
-                            <div class="post-container"></div>
-                        </div>
-                    `;
+                                <div id="client-posts" class="content">
+                                    <h1>Your Posts:</h1>
+                                    <div class="post-container"></div>
+                                </div>
+                            `;
                             document.querySelector('.container').insertBefore(postContainer, document.querySelector('.middle2'));
                             const clientPosts = document.getElementById('client-posts');
                             const postsContainer = clientPosts.querySelector('.post-container');
@@ -101,24 +101,52 @@
                                         const projectItem = document.createElement('div');
                                         projectItem.classList.add('post-item');
                                         projectItem.innerHTML = `
-                                    <h3>${projectName}</h3>
-                                    <h4>Status: ${projectStatus}</h4>
-                                    <div class="description">
-                                        <strong>Description:</strong>
-                                        <div class="descontent">${projectDescription}</div>
-                                        <strong>Phases:</strong>
-                                        <ul>
-                                            ${projectPhases.map(phase => `
-                                                <li>
-                                                    ${phase.description || 'No phase description provided'}
-                                                    ${phase.company ? `<span>Company: ${phase.company.name}</span>` : '<button>Licitate</button>'}
-                                                </li>
-                                            `).join('')}
-                                        </ul>
-                                    </div>
-                                `;
+                                            <h3>${projectName}</h3>
+                                            <h4>Status: ${projectStatus}</h4>
+                                            <div class="description">
+                                                <strong>Description:</strong>
+                                                <div class="descontent">${projectDescription}</div>
+                                                <strong>Phases:</strong>
+                                                <ul>
+                                                    ${projectPhases.map(phase => `
+                                                        <li>
+                                                            ${phase.description || 'No phase description provided'}
+                                                            ${phase.company ? `<span>Company: ${phase.company.name}</span>` : ''}
+                                                            ${phase.state === "notpending" ? `<button data-phase-id="${phase.id}">Licitate</button>` : ''}
+                                                            ${phase.state === "finished" ? '<button>Review</button>' : ''}
+                                                        </li>
+                                                    `).join('')}
+                                                </ul>
+                                            </div>
+                                        `;
                                         postsContainer.appendChild(projectItem);
                                     }
+                                });
+
+                                // Move the event listener setup here
+                                const licitateButtons = document.querySelectorAll('button[data-phase-id]');
+                                licitateButtons.forEach(button => {
+                                    button.addEventListener('click', async () => {
+                                        const phaseId = button.getAttribute('data-phase-id');
+                                        console.log(phaseId);
+                                        try {
+                                            const response = await fetch('/api/addlicitation', {
+                                                method: 'POST',
+                                                headers: {
+                                                    'Content-Type': 'application/json'
+                                                },
+                                                body: JSON.stringify({ phaseId })
+                                            });
+                                            if (response.ok) {
+                                                console.log('Licitation added successfully');
+                                                // You can add additional logic here if needed
+                                            } else {
+                                                console.error('Failed to add licitation');
+                                            }
+                                        } catch (error) {
+                                            console.error('Error adding licitation:', error);
+                                        }
+                                    });
                                 });
                             }
                         } else {
@@ -131,6 +159,7 @@
                     };
 
                     xhr.send();
+
                 } else if (data.role === "company") {
                     // Fetch company details for companies
                     fetch('/api/company')
@@ -144,60 +173,60 @@
                             const detailsContainer = document.createElement('div');
                             detailsContainer.classList.add('middle');
                             detailsContainer.innerHTML = `
-                        <div id="company-details" class="content">
-                            <h1>Company Details:</h1>
-                            <div class="details-container">
-                                <div class="detail-item">
-                                    <p><strong>Name:</strong> ${data.company.name || 'No name available'}</p>
-                                    <form id="updateNameForm" method="PUT" action="/api/company/name">
-                                        <label for="new-name">New Name:</label>
-                                        <input type="text" id="new-name" name="new-name" required>
-                                        <button type="submit">Save</button>
-                                    </form>
+                                <div id="company-details" class="content">
+                                    <h1>Company Details:</h1>
+                                    <div class="details-container">
+                                        <div class="detail-item">
+                                            <p><strong>Name:</strong> ${data.company.name || 'No name available'}</p>
+                                            <form id="updateNameForm" method="PUT" action="/api/company/name">
+                                                <label for="new-name">New Name:</label>
+                                                <input type="text" id="new-name" name="new-name" required>
+                                                <button type="submit">Save</button>
+                                            </form>
+                                        </div>
+                                        <div class="detail-item">
+                                            <p><strong>Address:</strong> ${data.company.address || 'No address available'}</p>
+                                            <form id="updateAddressForm" method="PUT" action="/api/company/address">
+                                                <label for="new-address">New Address:</label>
+                                                <input type="text" id="new-address" name="new-address" required>
+                                                <button type="submit">Save</button>
+                                            </form>
+                                        </div>
+                                        <div class="detail-item">
+                                            <p><strong>Phone:</strong> ${data.company.phone || 'No phone available'}</p>
+                                            <form id="updatePhoneForm" method="PUT" action="/api/company/phone">
+                                                <label for="new-phone">New Phone:</label>
+                                                <input type="text" id="new-phone" name="new-phone" required>
+                                                <button type="submit">Save</button>
+                                            </form>
+                                        </div>
+                                        <div class="detail-item">
+                                            <p><strong>Description:</strong> ${data.company.description || 'No description available'}</p>
+                                            <form id="updateDescriptionForm" method="PUT" action="/api/company/description">
+                                                <label for="new-description">New Description:</label>
+                                                <textarea id="new-description" name="new-description" required></textarea>
+                                                <button type="submit">Save</button>
+                                            </form>
+                                        </div>
+                                        <div class="detail-item">
+                                            <p><strong>Motto:</strong> ${data.company.motto || 'No motto available'}</p>
+                                            <form id="updateMottoForm" method="PUT" action="/api/company/motto">
+                                                <label for="new-motto">New Motto:</label>
+                                                <input type="text" id="new-motto" name="new-motto" required>
+                                                <button type="submit">Save</button>
+                                            </form>
+                                        </div>
+                                        <div class="detail-item">
+                                          <p><strong>Profile Picture:</strong></p>
+                                          ${data.image && data.image.data ? `<img src="data:image/png;base64,${btoa(String.fromCharCode.apply(null, new Uint8Array(data.image.data.data)))}" alt="${data.image.name}" />` : '<p>No profile picture available</p>'}
+                                          <form id="profilePictureForm">
+                                            <input type="file" id="profilePictureInput" name="profilePicture" accept="image/*">
+                                            <button type="submit">Update Profile Picture</button>
+                                        </form>
+                                      </div>
+                                    </div>
                                 </div>
-                                <div class="detail-item">
-                                    <p><strong>Address:</strong> ${data.company.address || 'No address available'}</p>
-                                    <form id="updateAddressForm" method="PUT" action="/api/company/address">
-                                        <label for="new-address">New Address:</label>
-                                        <input type="text" id="new-address" name="new-address" required>
-                                        <button type="submit">Save</button>
-                                    </form>
-                                </div>
-                                <div class="detail-item">
-                                    <p><strong>Phone:</strong> ${data.company.phone || 'No phone available'}</p>
-                                    <form id="updatePhoneForm" method="PUT" action="/api/company/phone">
-                                        <label for="new-phone">New Phone:</label>
-                                        <input type="text" id="new-phone" name="new-phone" required>
-                                        <button type="submit">Save</button>
-                                    </form>
-                                </div>
-                                <div class="detail-item">
-                                    <p><strong>Description:</strong> ${data.company.description || 'No description available'}</p>
-                                    <form id="updateDescriptionForm" method="PUT" action="/api/company/description">
-                                        <label for="new-description">New Description:</label>
-                                        <textarea id="new-description" name="new-description" required></textarea>
-                                        <button type="submit">Save</button>
-                                    </form>
-                                </div>
-                                <div class="detail-item">
-                                    <p><strong>Motto:</strong> ${data.company.motto || 'No motto available'}</p>
-                                    <form id="updateMottoForm" method="PUT" action="/api/company/motto">
-                                        <label for="new-motto">New Motto:</label>
-                                        <input type="text" id="new-motto" name="new-motto" required>
-                                        <button type="submit">Save</button>
-                                    </form>
-                                </div>
-                                <div class="detail-item">
-                                  <p><strong>Profile Picture:</strong></p>
-                                  ${data.image && data.image.data ? `<img src="data:image/png;base64,${btoa(String.fromCharCode.apply(null, new Uint8Array(data.image.data.data)))}" alt="${data.image.name}" />` : '<p>No profile picture available</p>'}
-                                 <form id="profilePictureForm">
-                                    <input type="file" id="profilePictureInput" name="profilePicture" accept="image/*">
-                                    <button type="submit">Update Profile Picture</button>
-                                </form>
-                              </div>
-                            </div>
-                        </div>
-                    `;
+                            `;
                             document.querySelector('.container').insertBefore(detailsContainer, document.querySelector('.middle2'));
                             setupCompanyFormListeners();
                         })
@@ -206,13 +235,13 @@
                             const errorContainer = document.createElement('div');
                             errorContainer.classList.add('middle');
                             errorContainer.innerHTML = `
-                        <div id="company-details" class="content">
-                            <h1>Company Details:</h1>
-                            <div class="details-container">
-                                <p>Error fetching company details. Please try again later.</p>
-                            </div>
-                        </div>
-                    `;
+                                <div id="company-details" class="content">
+                                    <h1>Company Details:</h1>
+                                    <div class="details-container">
+                                        <p>Error fetching company details. Please try again later.</p>
+                                    </div>
+                                </div>
+                            `;
                             document.querySelector('.container').insertBefore(errorContainer, document.querySelector('.middle2'));
                         });
                 }

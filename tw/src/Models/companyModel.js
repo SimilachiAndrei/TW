@@ -22,9 +22,29 @@ async function addMotto(data, id) {
     }
 }
 
+async function addOffer(data, id) {
+    try {
+        const response = await databaseManager.addOffer(data, id);
+        return response;
+    } catch (error) {
+        console.error('Error in companyModel.addOffer:', error);
+        throw error; // Re-throw to handle in your controller
+    }
+}
+
 async function getCompany(id) {
     try {
         const response = await databaseManager.getCompany(id);
+        return response;
+    } catch (error) {
+        console.error('Error in companyModel.addMotto:', error);
+        throw error; // Re-throw to handle in your controller
+    }
+}
+
+async function getAvailableLicitations() {
+    try {
+        const response = await databaseManager.getAvailableLicitations();
         return response;
     } catch (error) {
         console.error('Error in companyModel.addMotto:', error);
@@ -46,4 +66,5 @@ async function updateOrInsertProfilePicture
 
 
 
-module.exports = { getCompanies, addMotto, getCompany, updateOrInsertProfilePicture };
+module.exports = { getCompanies, addMotto, getCompany, updateOrInsertProfilePicture, 
+    getAvailableLicitations, addOffer };

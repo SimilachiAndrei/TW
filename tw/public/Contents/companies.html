@@ -79,7 +79,6 @@
         </div>
     </div>
     
-    <script src="/Contents/scripts/circle.js"></script>
     <script src="/Contents/scripts/toggle.js"></script>
     <script>
         async function fetchCompanies() {
@@ -116,31 +115,32 @@
         }
 
         function populateCompanies(companies) {
-            const companyGrid = document.getElementById('company-grid');
-            companyGrid.innerHTML = ''; // Clear existing content
+    const companyGrid = document.getElementById('company-grid');
+    companyGrid.innerHTML = ''; // Clear existing content
 
-            companies.forEach(company => {
-                const companyDiv = document.createElement('div');
-                companyDiv.classList.add('company');
+    companies.forEach(company => {
+        const companyDiv = document.createElement('div');
+        companyDiv.classList.add('company');
 
-                const companyLink = document.createElement('a');
-                companyLink.href = `/${company.company.name}`; // You can set appropriate href for company details
+        const companyLink = document.createElement('a');
+        companyLink.href = `/company/${company.company.name}`; // You can set appropriate href for company details
 
-                const companyImage = document.createElement('img');
-                if (company.image.data) {
-                    companyImage.src = `data:image/jpeg;base64,${company.image.data}`;
-                } else {
-                    companyImage.src = '/Contents/css/images/default.jpg'; // Fallback image
-                }
-
-                const companyName = document.createTextNode(company.company.name);
-
-                companyLink.appendChild(companyImage);
-                companyLink.appendChild(companyName);
-                companyDiv.appendChild(companyLink);
-                companyGrid.appendChild(companyDiv);
-            });
+        const companyImage = document.createElement('img');
+        if (company.image && company.image.data) {
+            const base64Image = btoa(String.fromCharCode.apply(null, company.image.data.data));
+            companyImage.src = `data:image/jpeg;base64,${base64Image}`;
+        } else {
+            companyImage.src = '/Contents/css/images/default.jpg'; // Fallback image
         }
+
+        const companyName = document.createTextNode(company.company.name);
+
+        companyLink.appendChild(companyImage);
+        companyLink.appendChild(companyName);
+        companyDiv.appendChild(companyLink);
+        companyGrid.appendChild(companyDiv);
+    });
+}
 
         async function init() {
             const companies = await fetchCompanies();

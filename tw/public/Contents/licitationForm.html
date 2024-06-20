@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Licitation Page</title>
+    <title>Licitation Form</title>
     <link rel="stylesheet" href="/Contents/css/review.css">
     <link rel="icon" type="image/x-icon" href="/Contents/css/images/favicon.ico">
 </head>
@@ -26,19 +26,29 @@
         </div>
         <div class="middle">
             <div class="content">
-                <div class="licitations">
-                    <h2>Available Licitations:</h2>
-                    <div id="licitationList">
-                        <!-- Licitation items will be added dynamically here -->
+                <h2>Submit Your Offer</h2>
+                <form id="licitationForm">
+                    <input type="hidden" id="phaseId" name="phase_id">
+                    <div>
+                        <label for="price">Price:</label>
+                        <input type="number" id="price" name="price" required>
                     </div>
-                </div>
+                    <div>
+                        <label for="startDate">Start Date:</label>
+                        <input type="date" id="startDate" name="start_date" required>
+                    </div>
+                    <div>
+                        <label for="endDate">End Date:</label>
+                        <input type="date" id="endDate" name="end_date" required>
+                    </div>
+                    <button type="submit">Submit Offer</button>
+                </form>
             </div>
         </div>
         <div class="footer">
             <p>Copyright &copy; Team PlaCo</p>
         </div>
     </div>
-    <script src="/Contents/scripts/toggle.js"></script>
-    <script src="/Contents/scripts/fetchLicitations.js"></script>
+    <script src="/Contents/scripts/submitOffer.js"></script>
 </body>
 </html>

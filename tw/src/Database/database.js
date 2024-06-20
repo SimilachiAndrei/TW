@@ -12,6 +12,8 @@ const databaseInitialization = async (pool) => {
     DROP TABLE IF EXISTS "companies" CASCADE;
     DROP TABLE IF EXISTS "clients" CASCADE;
     DROP TABLE IF EXISTS "users" CASCADE;
+    DROP TABLE IF EXISTS "offers" CASCADE;
+
 `;
 
         await client.query(dropTablesQuery);
@@ -63,6 +65,18 @@ const databaseInitialization = async (pool) => {
         "description" TEXT,
         "start_date"  DATE,
         "end_date"    DATE,
+        "state"       TEXT,
+        "company_id"  INTEGER REFERENCES companies(user_id) ON DELETE CASCADE,
+        "price"       NUMERIC(10, 2)
+    );`;
+
+    const createOfferTableQuery = `
+    CREATE TABLE IF NOT EXISTS "offers"
+    (
+        "id"          SERIAL PRIMARY KEY,
+        "phase_id"    INTEGER NOT NULL REFERENCES phases(id) ON DELETE CASCADE,
+        "start_date"  DATE,
+        "end_date"    DATE,
         "company_id"  INTEGER REFERENCES companies(user_id) ON DELETE CASCADE,
         "price"       NUMERIC(10, 2)
     );`;
@@ -93,6 +107,7 @@ const databaseInitialization = async (pool) => {
         await client.query(createPhasesTableQuery);
         await client.query(createImagesTableQuery);
         await client.query(createReviewTableQuery);
+        await client.query(createOfferTableQuery);
 
 
         const insertAdminAccountQuery = `INSERT INTO users (username, email, password, role)
