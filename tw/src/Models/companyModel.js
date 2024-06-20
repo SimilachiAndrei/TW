@@ -1,3 +1,4 @@
+// const { getProjects } = require('../Controllers/companiesController');
 const databaseManager = require('../Database/dbManager'); // Ensure the correct path to your companyModel
 
 async function getCompanies(req, res) {
@@ -52,6 +53,16 @@ async function getAvailableLicitations() {
     }
 }
 
+async function getProjects(id) {
+    try {
+        const response = await databaseManager.getProjects(id);
+        return response;
+    } catch (error) {
+        console.error('Error in companyModel.getProjects:', error);
+        throw error; // Re-throw to handle in your controller
+    }
+}
+
 async function updateOrInsertProfilePicture
     (userId, fileName, imageData) {
         try {
@@ -63,8 +74,17 @@ async function updateOrInsertProfilePicture
         }
 }
 
-
+async function addPhasePicture
+    (phaseId, fileName, imageData) {
+        try {
+            const response = await databaseManager.addPhasePicture(phaseId, fileName, imageData);
+            return response;
+        } catch (error) {
+            console.error('Error in companyModel.addMotto:', error);
+            throw error; // Re-throw to handle in your controller
+        }
+}
 
 
 module.exports = { getCompanies, addMotto, getCompany, updateOrInsertProfilePicture, 
-    getAvailableLicitations, addOffer };
+    getAvailableLicitations, addOffer, getProjects, addPhasePicture };

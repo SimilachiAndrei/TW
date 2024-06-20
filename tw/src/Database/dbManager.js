@@ -2,6 +2,7 @@
 
 const { Pool } = require('pg');
 const bcrypt = require('bcrypt');
+// const { acceptOffer } = require('../Models/userModel');
 // const { getCompany } = require('../Models/companyModel');
 
 const pool = new Pool({
@@ -123,8 +124,6 @@ async function addOffer(data, companyId) {
     const jsonString = Object.keys(data)[0]; // Get the JSON string key
     const dates = JSON.parse(jsonString); // Parse the JSON string into an object
     const { phase_id, start_date, end_date, price } = dates;
-    console.log(data);
-    console.log(phase_id);
     try {
         // Check if the phase exists and its state is 'pending'
         const phaseQuery = 'SELECT state FROM phases WHERE id = $1';
@@ -145,7 +144,7 @@ async function addOffer(data, companyId) {
             INSERT INTO offers (phase_id, start_date, end_date, company_id, price)
             VALUES ($1, $2, $3, $4, $5)
             RETURNING id`;
-        
+
         const values = [phase_id, start_date, end_date, companyId, price];
         const result = await pool.query(insertQuery, values);
 
@@ -155,11 +154,6 @@ async function addOffer(data, companyId) {
         throw error; // Re-throw the error to be handled in the controller
     }
 }
-
-module.exports = {
-    addOffer,
-};
-
 
 
 
@@ -183,7 +177,9 @@ const getAllUserData = async (username) => {
             co.company_name,
             co.company_address,
             co.company_phone,
-            co.company_profile
+            co.company_profile,
+            i.id AS image_id,
+            i.data AS image_data
         FROM 
             users u
         LEFT JOIN 
@@ -193,7 +189,9 @@ const getAllUserData = async (username) => {
         LEFT JOIN 
             phases ph ON ph.project_id = p.id
         LEFT JOIN 
-            companies co ON co.id = ph.company_id
+            companies co ON co.user_id = ph.company_id
+        LEFT JOIN 
+            images i ON i.phase_id = ph.id
         WHERE 
             u.username = $1;
     `;
@@ -201,6 +199,12 @@ const getAllUserData = async (username) => {
 
     try {
         const result = await pool.query(query, values);
+
+        // Check if result.rows has any elements
+        if (result.rows.length === 0) {
+            return [];
+        }
+
         const userData = {
             user: {
                 id: result.rows[0].user_id,
@@ -220,30 +224,44 @@ const getAllUserData = async (username) => {
                     projects.push(project);
                 }
                 if (row.phase_id) {
-                    project.phases.push({
-                        id: row.phase_id,
-                        description: row.phase_description,
-                        startDate: row.start_date,
-                        endDate: row.end_date,
-                        state: row.state,
-                        company: row.company_id ? {
-                            id: row.company_id,
-                            name: row.company_name,
-                            address: row.company_address,
-                            phone: row.company_phone,
-                            profile: row.company_profile
-                        } : null
-                    });
+                    let phase = project.phases.find(phase => phase.id === row.phase_id);
+                    if (!phase) {
+                        phase = {
+                            id: row.phase_id,
+                            description: row.phase_description,
+                            startDate: row.start_date,
+                            endDate: row.end_date,
+                            state: row.state,
+                            company: row.company_id ? {
+                                id: row.company_id,
+                                name: row.company_name,
+                                address: row.company_address,
+                                phone: row.company_phone,
+                                profile: row.company_profile
+                            } : null,
+                            images: []
+                        };
+                        project.phases.push(phase);
+                    }
+                    if (row.image_id) {
+                        phase.images.push({
+                            id: row.image_id,
+                            data: row.image_data
+                        });
+                    }
                 }
                 return projects;
             }, [])
         };
+
         return userData;
     } catch (error) {
         console.error('Error retrieving all user data:', error);
         throw error;
     }
 };
+
+
 
 const getCompanies = async () => {
     const query = `
@@ -291,8 +309,6 @@ async function addMotto(userData, id) {
         const data = JSON.parse(Object.keys(userData)[0]); // Parse the first key (which is the JSON string)
 
         const motto = data.motto; // Extract the motto property
-
-        console.log('Received motto:', motto);
 
         // Update the companies table with the motto
         const result = await pool.query(
@@ -411,8 +427,143 @@ const getAvailableLicitations = async () => {
     }
 };
 
+
+
+async function getOffers(clientId) {
+    const query = `
+        SELECT 
+            o.id, 
+            o.phase_id, 
+            o.start_date, 
+            o.end_date, 
+            o.company_id, 
+            o.price,
+            u.username AS company_name
+        FROM 
+            offers o 
+        JOIN 
+            phases ph ON ph.id = o.phase_id 
+        JOIN 
+            projects pr ON ph.project_id = pr.id 
+        JOIN 
+            companies co ON co.user_id = o.company_id 
+        JOIN 
+            users u ON co.user_id = u.id
+        WHERE 
+            pr.client_id = $1;
+    `;
+
+    try {
+        const result = await pool.query(query, [clientId]);
+        return result.rows;
+    } catch (error) {
+        console.error('Error retrieving offers:', error);
+        throw error;
+    }
+}
+
+async function acceptOffer(offerId) {
+    try {
+        // Begin transaction
+        await pool.query('BEGIN');
+
+        try {
+            // Retrieve offer details
+            const offerQuery = `
+                SELECT 
+                    o.phase_id, 
+                    o.start_date, 
+                    o.end_date, 
+                    o.company_id, 
+                    o.price
+                FROM 
+                    offers o
+                WHERE 
+                    o.id = $1;
+            `;
+            const offerResult = await pool.query(offerQuery, [offerId]);
+            const offer = offerResult.rows[0];
+
+            if (!offer) {
+                throw new Error('Offer not found');
+            }
+
+            // Update phases table
+            const updatePhaseQuery = `
+                UPDATE phases
+                SET start_date = $1,
+                    end_date = $2,
+                    price = $3,
+                    company_id = $4,
+                    state = 'taken'
+                WHERE id = $5;
+            `;
+            await pool.query(updatePhaseQuery, [offer.start_date, offer.end_date, offer.price, offer.company_id, offer.phase_id]);
+
+            // Delete related offers
+            const deleteOffersQuery = `
+                DELETE FROM offers
+                WHERE phase_id = $1;
+            `;
+            await pool.query(deleteOffersQuery, [offer.phase_id]);
+
+            // Commit transaction
+            await pool.query('COMMIT');
+
+            return { message: 'Offer accepted successfully' };
+        } catch (error) {
+            // Rollback transaction on error
+            await pool.query('ROLLBACK');
+            console.error('Error during transaction in acceptOffer:', error);
+            throw error;
+        }
+    } catch (error) {
+        console.error('Error in acceptOffer:', error);
+        throw error;
+    }
+}
+
+
+async function getProjects(companyId) {
+    const query = `
+     SELECT id , description FROM
+     phases where company_id = $1 and state LIKE 'taken'
+    `;
+
+    try {
+        const result = await pool.query(query, [companyId]);
+        return result.rows;
+    } catch (error) {
+        console.error('Error retrieving projects:', error);
+        throw error;
+    }
+}
+
+
+async function addPhasePicture(phaseId, fileName, fileData) {
+    try {
+        const query = `
+            INSERT INTO images (name, phase_id, data)
+            VALUES ($1, $2, $3)
+        `;
+        const values = [fileName, phaseId, fileData];
+        await pool.query(query, values);
+
+        const query2 = `
+            UPDATE phases SET state = 'finished' WHERE id = $1
+        `;
+        const values2 = [phaseId];
+        await pool.query(query2, values2);
+    } catch (error) {
+        console.error('Error in companyModel.addPhasePicture:', error);
+        throw error;
+    }
+}
+
+
 module.exports = {
     getUserByUsername, addUser, getAllUserData, addPost,
     getCompanies, addMotto, getCompany, updateOrInsertProfilePicture, addLicitation,
-    getAvailableLicitations, addOffer
+    getAvailableLicitations, addOffer, getOffers, acceptOffer, getProjects,
+    addPhasePicture
 };

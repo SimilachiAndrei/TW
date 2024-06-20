@@ -69,7 +69,7 @@ async function login(req, res) {
         const formData = new URLSearchParams(body);
         const username = formData.get('username');
         const password = formData.get('password');
-        
+
         const user = await userModel.getUser(username);
 
         if (!user || !(await bcrypt.compare(password, user.password))) {
@@ -77,8 +77,8 @@ async function login(req, res) {
             res.end(`
             <script>alert('Invalid credentials!');</script>
             <script>window.location.href = "/login";</script>
-          `); 
-          return;
+          `);
+            return;
         }
         const token = auth.generateToken(user);
 
@@ -101,7 +101,7 @@ function isUserType(req, type) {
     const cookies = parse(req.headers.cookie || '');
     const token = cookies.token;
     const user = auth.verifyToken(token);
-    if(user.role === type) return true;
+    if (user.role === type) return true;
     return false;
 }
 
@@ -145,5 +145,68 @@ async function getUserData(req, res) {
         res.end(JSON.stringify({ error: 'Internal Server Error' }));
     }
 }
-module.exports = { signup, login, isAuthenticated, logout, isUserType, getUserData, getUserType };
+
+async function getOffers(req, res) {
+    const user = isAuthenticated(req);
+    if (!user) {
+        res.writeHead(401, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'Unauthorized' }));
+        return;
+    }
+
+    try {
+        const offers = await userModel.getOffers(user.id);
+        if (!offers.length) {
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify('No offers found'));
+            return;
+        }
+
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify(offers));
+    } catch (error) {
+        console.error('Error in userController.getOffers:', error);
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'Internal Server Error' }));
+    }
+}
+
+async function acceptOffer(req, res) {
+    const user = isAuthenticated(req);
+    if (!user) {
+        res.writeHead(401, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'Unauthorized' }));
+        return;
+    }
+
+    let body = [];
+    req.on('data', (chunk) => {
+        body.push(chunk);
+    }).on('end', () => {
+        try {
+            body = Buffer.concat(body).toString();
+            const { offerId } = JSON.parse(body);
+
+            // Now you have access to offerId
+            console.log(offerId);
+
+            // Handle your business logic here, e.g., userModel.acceptOffer(offerId)
+            userModel.acceptOffer(offerId);
+            // Send response
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ message: 'Offer accepted successfully' }));
+        } catch (error) {
+            console.error('Error parsing JSON:', error);
+            res.writeHead(400, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ error: 'Invalid JSON' }));
+        }
+    });
+}
+
+
+
+module.exports = {
+    signup, login, isAuthenticated, logout, isUserType, getUserData, getUserType,
+    getOffers, acceptOffer
+};
 

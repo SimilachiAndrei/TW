@@ -98,7 +98,7 @@
                     // Adjust menu items and buttons for client
                     // Add Licitations link to menu
                     const licitationsItem = document.createElement('li');
-                    licitationsItem.innerHTML = '<a href="/myLicitations">Licitations</a>';
+                    licitationsItem.innerHTML = '<a href="/myoffers">Licitations</a>';
                     menuList.appendChild(licitationsItem);
                     const postButton = document.createElement('button');
                     postButton.className = 'post';
@@ -114,6 +114,9 @@
                     if (companiesLink) {
                         companiesLink.parentNode.remove(); // Remove Companies link for companies
                     }
+                    const projectsItem = document.createElement('li');
+                    projectsItem.innerHTML = '<a href="/myprojects">My Projects</a>';
+                    menuList.appendChild(projectsItem);
 
                     // Change 'Post' button to 'Licitate' button
                     const licitateButton = document.createElement('button');

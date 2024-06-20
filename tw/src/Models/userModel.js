@@ -1,4 +1,5 @@
 // src/Models/userModel.js
+// const { acceptOffer } = require('../Controllers/userController');
 const databaseManager = require('../Database/dbManager');
 
 async function addUser(userData) {
@@ -49,6 +50,16 @@ async function getUser(username) {
     }
 }
 
+async function getOffers(id) {
+    try {
+        const offers = await databaseManager.getOffers(id);
+        return offers;
+    } catch (error) {
+        console.error('Error in userModel.getUser:', error);
+        throw error; 
+    }
+}
+
 
 async function getAllUserData(username) {
     try {
@@ -60,4 +71,16 @@ async function getAllUserData(username) {
     }
 }
 
-module.exports = { addUser, getUser, getAllUserData, addPost, addLicitation }; // Ensure getAllUserData is exported
+async function acceptOffer(id) {
+    try {
+        const offers = await databaseManager.acceptOffer(id);
+        return offers;
+    } catch (error) {
+        console.error('Error in userModel.acceptOffer:', error);
+        throw error; 
+    }
+}
+
+module.exports = { addUser, getUser, getAllUserData, addPost, addLicitation,
+    getOffers, acceptOffer
+ }; // Ensure getAllUserData is exported

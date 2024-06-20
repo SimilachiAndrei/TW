@@ -80,6 +80,18 @@ function handleRequest(req, res) {
                 }
                 filePath = path.join(__dirname, '..', '..', 'public', 'Contents', 'licitations.html');
                 break;
+            case pathname === '/myoffers':
+                if (!userController.isAuthenticated(req)) {
+                    res.writeHead(302, { 'Location': '/login' });
+                    res.end();
+                    return;
+                } else if (!userController.isUserType(req, 'client')) {
+                    res.setHeader('Content-Type', 'text/html');
+                    res.end('<script>window.location.href = "/afterlog";</script>');
+                    return;
+                }
+                filePath = path.join(__dirname, '..', '..', 'public', 'Contents', 'myoffers.html');
+                break;
             case pathname.startsWith('/licitationForm'):
                 if (!userController.isAuthenticated(req)) {
                     res.writeHead(302, { 'Location': '/login' });
@@ -92,21 +104,13 @@ function handleRequest(req, res) {
                 }
                 filePath = path.join(__dirname, '..', '..', 'public', 'Contents', 'licitationForm.html');
                 break;
-            case pathname === '/houses':
+            case pathname === '/myprojects':
                 if (!userController.isAuthenticated(req)) {
                     res.writeHead(302, { 'Location': '/login' });
                     res.end();
                     return;
                 }
-                filePath = path.join(__dirname, '..', '..', 'public', 'Contents', 'houses.html');
-                break;
-            case pathname === '/instalatii':
-                if (!userController.isAuthenticated(req)) {
-                    res.writeHead(302, { 'Location': '/login' });
-                    res.end();
-                    return;
-                }
-                filePath = path.join(__dirname, '..', '..', 'public', 'Contents', 'instalatii.html');
+                filePath = path.join(__dirname, '..', '..', 'public', 'Contents', 'myprojects.html');
                 break;
             case pathname === '/api/user-data':
                 myAccountController.getUserData(req, res);
@@ -124,6 +128,15 @@ function handleRequest(req, res) {
                 return;
             case pathname === '/api/licitations':
                 companiesController.getAvailableLicitations(req, res);
+                return;
+            case pathname === '/api/offers':
+                userController.getOffers(req, res);
+                return;
+            case pathname === '/api/projects':
+                companiesController.getProjects(req, res);
+                return;
+            case pathname === '/api/projects':
+                companiesController.getProjects(req, res);
                 return;
             default:
                 filePath = path.join(__dirname, '..', '..', 'public', req.url);
@@ -189,6 +202,20 @@ function handleRequest(req, res) {
                     }
                     companiesController.updateProfilePicture(req, res);
                 });
+                break;
+            case '/api/uploadImage':
+                upload.single('phasePicture')(req, res, function (err) {
+                    if (err) {
+                        console.error('Error in file upload:', err);
+                        res.writeHead(500, { 'Content-Type': 'application/json' });
+                        res.end(JSON.stringify({ error: 'Internal Server Error' }));
+                        return;
+                    }
+                    companiesController.addPhasePicture(req, res);
+                });
+                break;
+            case '/api/acceptoffer':
+                userController.acceptOffer(req, res);
                 break;
             default:
                 res.writeHead(404, { 'Content-Type': 'text/plain' });
