@@ -16,8 +16,6 @@
                 <ul>
                     <li><a href="/myacc">My Account</a></li>
                     <li><a href="/about">About</a></li>
-                    <!-- <li class="ref1"><a href="#description">Description</a></li>
-                    <li class="ref2"><a href="#contact">Contact</a></li> -->
                 </ul>
                 <div class="menu-toggle">
                     <span></span>
@@ -25,14 +23,8 @@
                     <span></span>
                 </div>
             </nav>
-            
+
             <h2>Construction Companies</h2>
-            <!-- <nav class="menu">
-                <ul>
-                    <li><a href="#description">Description</a></li>
-                    <li><a href="#contact">Contact</a></li>
-                </ul>
-            </nav> -->
             <a href="/afterlog" class="titlu">Pla<div class="cletter">c<div class="image"></div></div><span class="oletter">o</span></a>
 
         </div>
@@ -78,7 +70,7 @@
             <p>Copyright &copy; Team PlaCo</p>
         </div>
     </div>
-    
+
     <script src="/Contents/scripts/toggle.js"></script>
     <script>
         async function fetchCompanies() {
@@ -114,37 +106,62 @@
             });
         }
 
-        function populateCompanies(companies) {
-    const companyGrid = document.getElementById('company-grid');
-    companyGrid.innerHTML = ''; // Clear existing content
+        function filterCompanies(companies) {
+            const locationFilter = document.getElementById('location').value;
+            const constructionFilter = document.getElementById('construction').value;
 
-    companies.forEach(company => {
-        const companyDiv = document.createElement('div');
-        companyDiv.classList.add('company');
-
-        const companyLink = document.createElement('a');
-        companyLink.href = `/company/${company.company.name}`; // You can set appropriate href for company details
-
-        const companyImage = document.createElement('img');
-        if (company.image && company.image.data) {
-            const base64Image = btoa(String.fromCharCode.apply(null, company.image.data.data));
-            companyImage.src = `data:image/jpeg;base64,${base64Image}`;
-        } else {
-            companyImage.src = '/Contents/css/images/default.jpg'; // Fallback image
+            return companies.filter(company => {
+                const matchesLocation = !locationFilter || company.company.address === locationFilter;
+                const matchesConstruction = !constructionFilter || company.company.profile === constructionFilter;
+                return matchesLocation && matchesConstruction;
+            });
         }
 
-        const companyName = document.createTextNode(company.company.name);
+        function populateCompanies(companies) {
+            const companyGrid = document.getElementById('company-grid');
+            companyGrid.innerHTML = ''; // Clear existing content
 
-        companyLink.appendChild(companyImage);
-        companyLink.appendChild(companyName);
-        companyDiv.appendChild(companyLink);
-        companyGrid.appendChild(companyDiv);
-    });
-}
+            companies.forEach(company => {
+                const companyDiv = document.createElement('div');
+                companyDiv.classList.add('company');
+
+                const companyLink = document.createElement('a');
+                companyLink.href = `/company/${company.company.name}`; // You can set appropriate href for company details
+
+                const companyImage = document.createElement('img');
+                if (company.image && company.image.data) {
+                    const base64Image = btoa(String.fromCharCode.apply(null, company.image.data.data));
+                    companyImage.src = `data:image/jpeg;base64,${base64Image}`;
+                } else {
+                    companyImage.src = '/Contents/css/images/default.jpg'; // Fallback image
+                }
+
+                const companyName = document.createTextNode(company.company.name);
+
+                companyLink.appendChild(companyImage);
+                companyLink.appendChild(companyName);
+                companyDiv.appendChild(companyLink);
+                companyGrid.appendChild(companyDiv);
+            });
+        }
 
         async function init() {
             const companies = await fetchCompanies();
             populateFilters(companies);
+
+            const locationSelect = document.getElementById('location');
+            const constructionSelect = document.getElementById('construction');
+
+            locationSelect.addEventListener('change', () => {
+                const filteredCompanies = filterCompanies(companies);
+                populateCompanies(filteredCompanies);
+            });
+
+            constructionSelect.addEventListener('change', () => {
+                const filteredCompanies = filterCompanies(companies);
+                populateCompanies(filteredCompanies);
+            });
+
             populateCompanies(companies);
         }
 
