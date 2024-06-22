@@ -60,4 +60,18 @@ async function getProjects(req, res) {
 
 }
 
-module.exports = {addPhasePicture, getProjects}
+
+async function subcontract(res,phaseId) {
+    try {
+        const response = await phaseModel.subcontract(phaseId);
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify(response));
+    } catch (error) {
+        console.error('Error in myProjectsController.subcontract:', error);
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'Internal Server Error' }));
+    }
+
+}
+
+module.exports = {addPhasePicture, getProjects, subcontract}

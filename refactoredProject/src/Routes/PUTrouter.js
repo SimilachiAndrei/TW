@@ -11,6 +11,21 @@ function handleRequest(req, res) {
         case '/api/company/motto':
             myAccountController.addMotto(req, res);
             break;
+        case '/api/company/description':
+            myAccountController.addDescription(req, res);
+            break;
+        case '/api/company/phone':
+            myAccountController.addPhone(req, res);
+            break;
+        case '/api/company/address':
+            myAccountController.addAddress(req, res);
+            break;
+        case '/api/company/name':
+            myAccountController.addName(req, res);
+            break;
+        case '/api/changePassword':
+            myAccountController.changePassword(req, res);
+            break;
         case '/api/company/profile-picture':
             upload.single('profilePicture')(req, res, function (err) {
                 if (err) {

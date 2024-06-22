@@ -22,6 +22,47 @@ async function addMotto(data, id) {
     }
 }
 
+async function addName(data, id) {
+    try {
+        const response = await databaseManager.addName(data, id);
+        return response;
+    } catch (error) {
+        console.error('Error in companyModel.addName:', error);
+        throw error;
+    }
+}
+
+async function addAddress(data, id) {
+    try {
+        const response = await databaseManager.addAddress(data, id);
+        return response;
+    } catch (error) {
+        console.error('Error in companyModel.addAddress:', error);
+        throw error;
+    }
+}
+
+async function addPhone(data, id) {
+    try {
+        const response = await databaseManager.addPhone(data, id);
+        return response;
+    } catch (error) {
+        console.error('Error in companyModel.addPhone:', error);
+        throw error;
+    }
+}
+
+
+async function addDescription(data, id) {
+    try {
+        const response = await databaseManager.addDescription(data, id);
+        return response;
+    } catch (error) {
+        console.error('Error in companyModel.addDescription:', error);
+        throw error;
+    }
+}
+
 async function getCompany(id) {
     try {
         const response = await databaseManager.getCompany(id);
@@ -62,4 +103,4 @@ async function getCompanyReviews(companyName) {
 
 
 module.exports = { getCompanies, addMotto, getCompany, getCompanyDetails, 
-    getCompanyPhases, getCompanyReviews };
+    getCompanyPhases, getCompanyReviews, addName, addAddress, addPhone, addDescription };

@@ -22,5 +22,14 @@ async function getUser(username) {
     }
 }
 
+async function changePassword(userId, oldPassword, newPassword) {
+    try {
+        const user = await databaseManager.changePassword(userId, oldPassword, newPassword);
+        return user;
+    } catch (error) {
+        console.error('Error in userModel.getUser:', error);
+        throw error; 
+    }
+}
 
-module.exports = { addUser, getUser};
+module.exports = { addUser, getUser, changePassword};

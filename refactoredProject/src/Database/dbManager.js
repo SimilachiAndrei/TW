@@ -20,7 +20,7 @@ async function getUserByUsername(username) {
         return result.rows[0];
     } catch (error) {
         console.error('Error getting user:', error);
-        throw error; // Re-throw the error for handling elsewhere
+        throw error;
     }
 }
 
@@ -38,7 +38,7 @@ async function addUser(userData) {
             [username, email, hashedPassword, role]
         );
 
-        const userId = result.rows[0].id; // Get the newly created user ID
+        const userId = result.rows[0].id;
 
         if (role === 'client') {
             // Insert client-specific data into the clients table
@@ -75,7 +75,7 @@ async function addPost(postData, clientId) {
             [clientId, projectName, description]
         );
 
-        const projectId = result.rows[0].id; // Get the newly created project ID
+        const projectId = result.rows[0].id;
 
         const phaseList = Object.values(phasesObj);
 
@@ -100,28 +100,26 @@ async function addLicitation(postData, clientId) {
     }
 
     try {
-        const jsonString = Object.keys(postData)[0]; // Get the JSON string key
-        const data = JSON.parse(jsonString); // Parse the JSON string into an object
-        const id = data.phaseId; // Access the id from the parsed object
+        const jsonString = Object.keys(postData)[0];
+        const data = JSON.parse(jsonString);
+        const id = data.phaseId;
 
-        // Assuming you have a pool for database queries
         const result = await pool.query(
             'UPDATE phases SET state = $1 WHERE id = $2',
             ['pending', id]
         );
 
-        return result.rows[0]; // Return the updated row
+        return result.rows[0];
     } catch (error) {
         console.error('Error adding post:', error);
-        throw error; // Throw error to handle it upstream
+        throw error;
     }
 }
 
-// Assuming you have a database connection pool initialized (e.g., 'pool')
 
 async function addOffer(data, companyId) {
-    const jsonString = Object.keys(data)[0]; // Get the JSON string key
-    const dates = JSON.parse(jsonString); // Parse the JSON string into an object
+    const jsonString = Object.keys(data)[0];
+    const dates = JSON.parse(jsonString);
     const { phase_id, start_date, end_date, price } = dates;
     try {
         // Check if the phase exists and its state is 'pending'
@@ -304,10 +302,9 @@ const getCompanies = async () => {
 
 async function addMotto(userData, id) {
     try {
-        // Parse userData to extract the motto property
-        const data = JSON.parse(Object.keys(userData)[0]); // Parse the first key (which is the JSON string)
+        const data = JSON.parse(Object.keys(userData)[0]);
 
-        const motto = data.motto; // Extract the motto property
+        const motto = data.motto;
 
         // Update the companies table with the motto
         const result = await pool.query(
@@ -321,6 +318,95 @@ async function addMotto(userData, id) {
         return result.rows[0];
     } catch (error) {
         console.error('Error adding motto:', error);
+        throw error;
+    }
+}
+
+async function addDescription(userData, id) {
+    try {
+        const data = JSON.parse(Object.keys(userData)[0]);
+
+        const description = data.description;
+
+        // Update the companies table with the motto
+        const result = await pool.query(
+            'UPDATE companies SET description = $1 WHERE user_id = $2 RETURNING id',
+            [description, id]
+        );
+
+        const companyId = result.rows[0].id; // Get the updated company ID
+
+        // Return the updated company information
+        return result.rows[0];
+    } catch (error) {
+        console.error('Error adding description:', error);
+        throw error;
+    }
+}
+
+async function addName(userData, id) {
+    try {
+        const data = JSON.parse(Object.keys(userData)[0]);
+
+        const name = data.name;
+
+        // Update the companies table with the motto
+        const result = await pool.query(
+            'UPDATE companies SET company_name = $1 WHERE user_id = $2 RETURNING id',
+            [name, id]
+        );
+
+        const companyId = result.rows[0].id; // Get the updated company ID
+
+        // Return the updated company information
+        return result.rows[0];
+    } catch (error) {
+        console.error('Error adding name:', error);
+        throw error;
+    }
+}
+
+
+async function addAddress(userData, id) {
+    try {
+        const data = JSON.parse(Object.keys(userData)[0]);
+
+        const address = data.address;
+
+        // Update the companies table with the motto
+        const result = await pool.query(
+            'UPDATE companies SET company_address = $1 WHERE user_id = $2 RETURNING id',
+            [address, id]
+        );
+
+        const companyId = result.rows[0].id; // Get the updated company ID
+
+        // Return the updated company information
+        return result.rows[0];
+    } catch (error) {
+        console.error('Error adding address:', error);
+        throw error;
+    }
+}
+
+async function addPhone(userData, id) {
+    try {
+        const data = JSON.parse(Object.keys(userData)[0]);
+
+        const phone = data.phone;
+
+        // Update the companies table with the motto
+        const result = await pool.query(
+            'UPDATE companies SET company_phone = $1 WHERE user_id = $2 RETURNING id',
+            [phone, id]
+        );
+
+        const companyId = result.rows[0].id; // Get the updated company ID
+
+        // Return the updated company information
+        return result.rows[0];
+    } catch (error) {
+        console.error('Error adding phone:', error);
         throw error;
     }
 }
@@ -547,9 +633,7 @@ async function getFinishedProjects(userId) {
     `;
 
     try {
-        console.log('Executing query with userId:', userId); // Log query execution
         const result = await pool.query(query, [userId]);
-        console.log('Query result:', result.rows); // Log query result
         return result.rows;
     } catch (error) {
         console.error('Error retrieving projects:', error);
@@ -580,8 +664,8 @@ async function addPhasePicture(phaseId, fileName, fileData) {
 
 
 async function submitReview(data, userId) {
-    const jsonString = Object.keys(data)[0]; // Get the JSON string key
-    const dates = JSON.parse(jsonString); // Parse the JSON string into an object
+    const jsonString = Object.keys(data)[0];
+    const dates = JSON.parse(jsonString);
     const { company_id, phase_id, description } = dates;
     try {
         // Insert the offer into the offers table client_id | company_id | phase_id | description
@@ -602,7 +686,7 @@ async function submitReview(data, userId) {
         return true;
     } catch (error) {
         console.error('Error adding offer:', error);
-        throw error; // Re-throw the error to be handled in the controller
+        throw error;
     }
 }
 
@@ -691,10 +775,61 @@ async function getCompanyReviews(companyName) {
 }
 
 
+async function subcontract(id) {
+    const query = `
+        UPDATE phases SET price = NULL , company_id = NULL, start_date = NULL, end_date = NULL,
+        state = 'pending' where id = $1;
+    `;
+    try {
+        const result = await pool.query(query, [id]);
+        return result.rows;
+    } catch (error) {
+        console.error('Error retrieving company reviews:', error);
+        throw error;
+    }
+}
+
+async function changePassword(userId, oldPassword, newPassword) {
+    const selectQuery = `
+        SELECT password FROM users WHERE id = $1;
+    `;
+    const updateQuery = `
+        UPDATE users SET password = $1 WHERE id = $2;
+    `;
+
+    try {
+        // Fetch the existing hashed password from the database
+        const result = await pool.query(selectQuery, [userId]);
+        if (result.rows.length === 0) {
+            return null
+        }
+
+        const storedHashedPassword = result.rows[0].password;
+
+        // Compare the provided old password with the stored hashed password
+        const isMatch = await bcrypt.compare(oldPassword, storedHashedPassword);
+        if (!isMatch) {
+            return null;
+        }
+
+        // Hash the new password
+        const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+
+        // Update the password in the database
+        await pool.query(updateQuery, [hashedNewPassword, userId]);
+
+        return { success: true, message: 'Password changed successfully' };
+    } catch (error) {
+        console.error('Error changing password:', error);
+        throw error;
+    }
+}
+
 module.exports = {
     getUserByUsername, addUser, getAllUserData, addPost,
     getCompanies, addMotto, getCompany, updateOrInsertProfilePicture, addLicitation,
     getAvailableLicitations, addOffer, getOffers, acceptOffer, getProjects,
     addPhasePicture, getFinishedProjects, submitReview, getReviews, deleteReview,
-    getCompanyDetails, getCompanyPhases, getCompanyReviews
+    getCompanyDetails, getCompanyPhases, getCompanyReviews, subcontract,
+    addPhone, addAddress, addDescription, addName, changePassword
 };

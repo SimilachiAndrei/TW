@@ -27,7 +27,7 @@
             <!-- <div class="buttons">
                 <button class="post" onclick="location.href = '/post';">Post</button>
             </div> -->
-            
+
             <a href="/afterlog" class="titlu">Pla<div class="cletter">c<div class="image"></div>
                 </div><span class="oletter">o</span></a>
         </div>
@@ -40,7 +40,7 @@
                 <h1>Settings:</h1>
                 <div class="settings-container">
                     <h3>Change Your Password</h3>
-                    <form>
+                    <form id="changePasswordForm">
                         <label for="current-password">Current Password:</label>
                         <input type="password" id="current-password" name="current-password" required>
                         <label for="new-password">New Password:</label>
@@ -58,6 +58,9 @@
     </div>
     <script src="/Contents/scripts/toggle.js"></script>
     <script src="/Contents/scripts/myaccEventListeners.js"></script>
+    <script src="/Contents/scripts/buildClient.js"></script>
+    <script src="/Contents/scripts/buildCompany.js"></script>
+
     <script>
         fetch('/api/role')
             .then(response => {
@@ -68,192 +71,52 @@
             })
             .then(data => {
                 if (data.role === "client") {
-                    // Fetch posts for clients
-                    const xhr = new XMLHttpRequest();
-                    xhr.open('GET', '/api/user-data', true);
-
-                    xhr.onload = function () {
-                        if (xhr.status === 200) {
-                            const data = JSON.parse(xhr.responseText);
-                            const postContainer = document.createElement('div');
-                            postContainer.classList.add('middle');
-                            postContainer.innerHTML = `
-                                <div id="client-posts" class="content">
-                                    <h1>Your Posts:</h1>
-                                    <div class="post-container"></div>
-                                </div>
-                            `;
-                            document.querySelector('.container').insertBefore(postContainer, document.querySelector('.middle2'));
-                            const clientPosts = document.getElementById('client-posts');
-                            const postsContainer = clientPosts.querySelector('.post-container');
-                            postsContainer.innerHTML = '';
-
-                            if (!data.projects || data.projects.length === 0) {
-                                clientPosts.style.display = 'none';
-                            } else {
-                                clientPosts.style.display = 'block';
-                                data.projects.forEach(project => {
-                                    if (project.name !== null) {
-                                        const projectName = project.name || 'No name provided';
-                                        const projectDescription = project.description || 'No description provided';
-                                        const projectStatus = project.phases && project.phases.every(phase => (phase.state=='finished' || phase.state =='reviewed')) ? 'finished' : 'in progress';
-                                        const projectPhases = project.phases || [];
-
-                                        const projectItem = document.createElement('div');
-                                        projectItem.classList.add('post-item');
-                                        projectItem.innerHTML = `
-                                            <h3>${projectName}</h3>
-                                            <h4>Status: ${projectStatus}</h4>
-                                            <div class="description">
-                                                <strong>Description:</strong>
-                                                <div class="descontent">${projectDescription}</div>
-                                                <strong>Phases:</strong>
-                                                <ul>
-                                                    ${projectPhases.map(phase => `
-                                                        <li>
-                                                            ${phase.description || 'No phase description provided'}
-                                                            ${phase.company ? `<span>Company: ${phase.company.name}</span>` : ''}
-                                                            ${phase.state === "notpending" ? `<button data-phase-id="${phase.id}">Licitate</button>` : ''}
-                                                            </br>
-                                                            ${(phase.state === "finished"||phase.state==="reviewed") ? `
-                                                            ${phase.images.length > 0 ? `<img src="data:image/jpeg;base64,${btoa(String.fromCharCode(...new Uint8Array(phase.images[0].data.data)))}" alt="Phase Image" />` : ''}
-                                                            ` : ''}
-                                                        </li>
-                                                    `).join('')}
-                                                </ul>
-                                            </div>
-                                        `;
-                                        
-                                        postsContainer.appendChild(projectItem);
-                                    }
-                                });
-
-                                // Move the event listener setup here
-                                const licitateButtons = document.querySelectorAll('button[data-phase-id]');
-                                licitateButtons.forEach(button => {
-                                    button.addEventListener('click', async () => {
-                                        const phaseId = button.getAttribute('data-phase-id');
-                                        console.log(phaseId);
-                                        try {
-                                            const response = await fetch('/api/addlicitation', {
-                                                method: 'POST',
-                                                headers: {
-                                                    'Content-Type': 'application/json'
-                                                },
-                                                body: JSON.stringify({ phaseId })
-                                            });
-                                            if (response.ok) {
-                                                console.log('Licitation added successfully');
-                                                // You can add additional logic here if needed
-                                            } else {
-                                                console.error('Failed to add licitation');
-                                            }
-                                        } catch (error) {
-                                            console.error('Error adding licitation:', error);
-                                        }
-                                    });
-                                });
-                            }
-                        } else {
-                            console.error('Error fetching user data:', xhr.status);
-                        }
-                    };
-
-                    xhr.onerror = function () {
-                        console.error('Error fetching user data');
-                    };
-
-                    xhr.send();
-
+                    buildClient();
                 } else if (data.role === "company") {
-                    // Fetch company details for companies
-                    fetch('/api/company')
-                        .then(response => {
-                            if (!response.ok) {
-                                throw new Error('Network response was not ok');
-                            }
-                            return response.json();
-                        })
-                        .then(data => {
-                            const detailsContainer = document.createElement('div');
-                            detailsContainer.classList.add('middle');
-                            detailsContainer.innerHTML = `
-                                <div id="company-details" class="content">
-                                    <h1>Company Details:</h1>
-                                    <div class="details-container">
-                                        <div class="detail-item">
-                                            <p><strong>Name:</strong> ${data.company.name || 'No name available'}</p>
-                                            <form id="updateNameForm" method="PUT" action="/api/company/name">
-                                                <label for="new-name">New Name:</label>
-                                                <input type="text" id="new-name" name="new-name" required>
-                                                <button type="submit">Save</button>
-                                            </form>
-                                        </div>
-                                        <div class="detail-item">
-                                            <p><strong>Address:</strong> ${data.company.address || 'No address available'}</p>
-                                            <form id="updateAddressForm" method="PUT" action="/api/company/address">
-                                                <label for="new-address">New Address:</label>
-                                                <input type="text" id="new-address" name="new-address" required>
-                                                <button type="submit">Save</button>
-                                            </form>
-                                        </div>
-                                        <div class="detail-item">
-                                            <p><strong>Phone:</strong> ${data.company.phone || 'No phone available'}</p>
-                                            <form id="updatePhoneForm" method="PUT" action="/api/company/phone">
-                                                <label for="new-phone">New Phone:</label>
-                                                <input type="text" id="new-phone" name="new-phone" required>
-                                                <button type="submit">Save</button>
-                                            </form>
-                                        </div>
-                                        <div class="detail-item">
-                                            <p><strong>Description:</strong> ${data.company.description || 'No description available'}</p>
-                                            <form id="updateDescriptionForm" method="PUT" action="/api/company/description">
-                                                <label for="new-description">New Description:</label>
-                                                <textarea id="new-description" name="new-description" required></textarea>
-                                                <button type="submit">Save</button>
-                                            </form>
-                                        </div>
-                                        <div class="detail-item">
-                                            <p><strong>Motto:</strong> ${data.company.motto || 'No motto available'}</p>
-                                            <form id="updateMottoForm" method="PUT" action="/api/company/motto">
-                                                <label for="new-motto">New Motto:</label>
-                                                <input type="text" id="new-motto" name="new-motto" required>
-                                                <button type="submit">Save</button>
-                                            </form>
-                                        </div>
-                                        <div class="detail-item">
-                                          <p><strong>Profile Picture:</strong></p>
-                                          ${data.image && data.image.data ? `<img src="data:image/png;base64,${btoa(String.fromCharCode.apply(null, new Uint8Array(data.image.data.data)))}" alt="${data.image.name}" />` : '<p>No profile picture available</p>'}
-                                          <form id="profilePictureForm">
-                                            <input type="file" id="profilePictureInput" name="profilePicture" accept="image/*">
-                                            <button type="submit">Update Profile Picture</button>
-                                        </form>
-                                      </div>
-                                    </div>
-                                </div>
-                            `;
-                            document.querySelector('.container').insertBefore(detailsContainer, document.querySelector('.middle2'));
-                            setupCompanyFormListeners();
-                        })
-                        .catch(error => {
-                            console.error('Error fetching company details:', error);
-                            const errorContainer = document.createElement('div');
-                            errorContainer.classList.add('middle');
-                            errorContainer.innerHTML = `
-                                <div id="company-details" class="content">
-                                    <h1>Company Details:</h1>
-                                    <div class="details-container">
-                                        <p>Error fetching company details. Please try again later.</p>
-                                    </div>
-                                </div>
-                            `;
-                            document.querySelector('.container').insertBefore(errorContainer, document.querySelector('.middle2'));
-                        });
+                    buildCompany();
                 }
             })
             .catch(error => {
                 console.error('Error fetching role:', error);
             });
+
+        document.getElementById('changePasswordForm').addEventListener('submit', function (event) {
+            event.preventDefault();
+
+            const formData = new FormData(this);
+            const currentPassword = formData.get('current-password');
+            const newPassword = formData.get('new-password');
+            const confirmPassword = formData.get('confirm-password');
+
+            console.log(currentPassword);
+            console.log(newPassword);
+            console.log(confirmPassword);
+
+            const token = localStorage.getItem('jwtToken');
+
+            fetch('/api/changePassword', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({currentPassword, newPassword,confirmPassword })
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('PUT request successful:', data);
+                    alert(data.message || 'Password changed successfully');
+                })
+                .catch(error => {
+                    console.error('Error in PUT request:', error);
+                    alert(error.message || 'Error changing password');
+                });
+        });
     </script>
 
 </body>

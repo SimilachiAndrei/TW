@@ -44,4 +44,14 @@ async function getFinishedProjects(id) {
     }
 }
 
-module.exports = { addLicitation, getAvailableLicitations, getProjects, getFinishedProjects };
+async function subcontract(id) {
+    try {
+        const response = await databaseManager.subcontract(id);
+        return response;
+    } catch (error) {
+        console.error('Error in companyModel.getFinishedProjects:', error);
+        throw error; // Re-throw to handle in your controller
+    }
+}
+
+module.exports = { addLicitation, getAvailableLicitations, getProjects, getFinishedProjects, subcontract };
