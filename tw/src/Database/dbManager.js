@@ -2,6 +2,8 @@
 
 const { Pool } = require('pg');
 const bcrypt = require('bcrypt');
+// const { deleteReview } = require('../Models/companyModel');
+// const { submitReview } = require('../Models/companyModel');
 // const { acceptOffer } = require('../Models/userModel');
 // const { getCompany } = require('../Models/companyModel');
 
@@ -539,6 +541,25 @@ async function getProjects(companyId) {
     }
 }
 
+async function getFinishedProjects(userId) {
+    const query = `
+    SELECT ph.id, ph.company_id
+    FROM phases ph
+    JOIN projects pr ON pr.id = ph.project_id
+    WHERE pr.client_id = $1 AND ph.state LIKE 'finished';
+    `;
+
+    try {
+        console.log('Executing query with userId:', userId); // Log query execution
+        const result = await pool.query(query, [userId]);
+        console.log('Query result:', result.rows); // Log query result
+        return result.rows;
+    } catch (error) {
+        console.error('Error retrieving projects:', error);
+        throw error;
+    }
+}
+
 
 async function addPhasePicture(phaseId, fileName, fileData) {
     try {
@@ -561,9 +582,122 @@ async function addPhasePicture(phaseId, fileName, fileData) {
 }
 
 
+async function submitReview(data, userId) {
+    const jsonString = Object.keys(data)[0]; // Get the JSON string key
+    const dates = JSON.parse(jsonString); // Parse the JSON string into an object
+    const { company_id, phase_id, description } = dates;
+    try {
+        // Insert the offer into the offers table client_id | company_id | phase_id | description
+        const insertQuery = `
+            INSERT INTO reviews (client_id, company_id, phase_id, description)
+            VALUES ($1, $2, $3, $4)
+            RETURNING id`;
+
+        const values = [userId, company_id, phase_id, description];
+        const result = await pool.query(insertQuery, values);
+
+        const updatePhaseQuery = `
+        UPDATE phases SET state = 'reviewed' WHERE id = $1`;
+
+        const updateValues = [phase_id];
+        await pool.query(updatePhaseQuery, updateValues);
+
+        return true;
+    } catch (error) {
+        console.error('Error adding offer:', error);
+        throw error; // Re-throw the error to be handled in the controller
+    }
+}
+
+
+async function getReviews() {
+    const query = `
+    SELECT id, description FROM reviews;
+    `;
+
+    try {
+        const result = await pool.query(query, []);
+        return result.rows;
+    } catch (error) {
+        console.error('Error retrieving projects:', error);
+        throw error;
+    }
+}
+
+async function deleteReview(id) {
+    const query = `
+    DELETE FROM reviews WHERE id = $1;
+    `;
+
+    try {
+        const result = await pool.query(query, [id]);
+        return result.rows;
+    } catch (error) {
+        console.error('Error retrieving projects:', error);
+        throw error;
+    }
+}
+
+
+async function getCompanyDetails(companyName) {
+    const query = `
+        SELECT u.username, c.id, c.user_id, c.company_name, c.company_address, c.company_phone, 
+               c.company_profile, c.motto, c.description, i.data
+        FROM companies c
+        JOIN users u ON u.id = c.user_id
+        LEFT JOIN images i ON i.profile_picture = c.user_id
+        WHERE c.company_name = $1
+    `;
+    try {
+        const result = await pool.query(query, [companyName]);
+        return result.rows[0];
+    } catch (error) {
+        console.error('Error retrieving company details:', error);
+        throw error;
+    }
+}
+
+
+async function getCompanyPhases(companyName) {
+    const query = `
+        SELECT p.id, p.description, p.start_date, p.end_date, p.state, p.price , i.name,
+        i.data
+        FROM phases p
+        JOIN companies c ON p.company_id = c.user_id
+        LEFT JOIN images i ON i.phase_id = p.id
+        WHERE c.company_name = $1 and (p.state LIKE 'finished' or p.state LIKE 'reviewed')
+    `;
+    try {
+        const result = await pool.query(query, [companyName]);
+        return result.rows;
+    } catch (error) {
+        console.error('Error retrieving company phases:', error);
+        throw error;
+    }
+}
+
+
+async function getCompanyReviews(companyName) {
+    const query = `
+        SELECT r.id, r.client_id, r.phase_id, r.description
+        FROM reviews r
+        JOIN companies c ON r.company_id = c.user_id
+        WHERE c.company_name = $1
+    `;
+    try {
+        const result = await pool.query(query, [companyName]);
+        return result.rows;
+    } catch (error) {
+        console.error('Error retrieving company reviews:', error);
+        throw error;
+    }
+}
+
+
 module.exports = {
     getUserByUsername, addUser, getAllUserData, addPost,
     getCompanies, addMotto, getCompany, updateOrInsertProfilePicture, addLicitation,
     getAvailableLicitations, addOffer, getOffers, acceptOffer, getProjects,
-    addPhasePicture
+    addPhasePicture, getFinishedProjects, submitReview, getReviews, deleteReview,
+    getCompanyDetails, getCompanyPhases, getCompanyReviews
 };

@@ -23,6 +23,16 @@ async function addMotto(data, id) {
     }
 }
 
+async function submitReview(data, id) {
+    try {
+        const response = await databaseManager.submitReview(data, id);
+        return response;
+    } catch (error) {
+        console.error('Error in companyModel.addMotto:', error);
+        throw error; // Re-throw to handle in your controller
+    }
+}
+
 async function addOffer(data, id) {
     try {
         const response = await databaseManager.addOffer(data, id);
@@ -63,6 +73,26 @@ async function getProjects(id) {
     }
 }
 
+async function getFinishedProjects(id) {
+    try {
+        const response = await databaseManager.getFinishedProjects(id);
+        return response;
+    } catch (error) {
+        console.error('Error in companyModel.getFinishedProjects:', error);
+        throw error; // Re-throw to handle in your controller
+    }
+}
+
+async function getReviews() {
+    try {
+        const response = await databaseManager.getReviews();
+        return response;
+    } catch (error) {
+        console.error('Error in companyModel.getReviews:', error);
+        throw error; // Re-throw to handle in your controller
+    }
+}
+
 async function updateOrInsertProfilePicture
     (userId, fileName, imageData) {
         try {
@@ -85,6 +115,46 @@ async function addPhasePicture
         }
 }
 
+async function deleteReview(data) {
+    try {
+        const response = await databaseManager.deleteReview(data);
+        return response;
+    } catch (error) {
+        console.error('Error in companyModel.deleteReview:', error);
+        throw error; // Re-throw to handle in your controller
+    }
+}
+
+async function getCompanyDetails(companyName) {
+    try {
+        const company = await databaseManager.getCompanyDetails(companyName);
+        return company;
+    } catch (error) {
+        throw error;
+    }
+}
+
+async function getCompanyPhases(companyName) {
+    try {
+        const phases = await databaseManager.getCompanyPhases(companyName);
+        return phases;
+    } catch (error) {
+        throw error;
+    }
+}
+
+
+async function getCompanyReviews(companyName) {
+    try {
+        const reviews = await databaseManager.getCompanyReviews(companyName);
+        return reviews;
+    } catch (error) {
+        throw error;
+    }
+}
+
 
 module.exports = { getCompanies, addMotto, getCompany, updateOrInsertProfilePicture, 
-    getAvailableLicitations, addOffer, getProjects, addPhasePicture };
+    getAvailableLicitations, addOffer, getProjects, addPhasePicture,
+    getFinishedProjects, submitReview, getReviews, deleteReview,
+    getCompanyDetails, getCompanyPhases, getCompanyReviews };

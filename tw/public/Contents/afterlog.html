@@ -100,6 +100,11 @@
                     const licitationsItem = document.createElement('li');
                     licitationsItem.innerHTML = '<a href="/myoffers">Licitations</a>';
                     menuList.appendChild(licitationsItem);
+
+                    const reviewsItem = document.createElement('li');
+                    reviewsItem.innerHTML = '<a href="/reviews">Add Review</a>';
+                    menuList.appendChild(reviewsItem);
+
                     const postButton = document.createElement('button');
                     postButton.className = 'post';
                     postButton.textContent = 'Post';

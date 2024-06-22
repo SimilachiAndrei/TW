@@ -30,7 +30,10 @@ function handleRequest(req, res) {
                     res.end();
                     return;
                 }
-                filePath = path.join(__dirname, '..', '..', 'public', 'Contents', 'afterlog.html');
+                else if (!userController.isUserType(req, 'admin')) {
+                    filePath = path.join(__dirname, '..', '..', 'public', 'Contents', 'afterlog.html');
+                }
+                else filePath = path.join(__dirname, '..', '..', 'public', 'Contents', 'admin.html');
                 break;
             case pathname === '/myacc':
                 if (!userController.isAuthenticated(req)) {
@@ -47,6 +50,14 @@ function handleRequest(req, res) {
                     return;
                 }
                 filePath = path.join(__dirname, '..', '..', 'public', 'Contents', 'post.html');
+                break;
+            case pathname === '/reviews':
+                if (!userController.isAuthenticated(req)) {
+                    res.writeHead(302, { 'Location': '/login' });
+                    res.end();
+                    return;
+                }
+                filePath = path.join(__dirname, '..', '..', 'public', 'Contents', 'addReview.html');
                 break;
             case pathname === '/about':
                 if (!userController.isAuthenticated(req)) {
@@ -104,6 +115,18 @@ function handleRequest(req, res) {
                 }
                 filePath = path.join(__dirname, '..', '..', 'public', 'Contents', 'licitationForm.html');
                 break;
+            case pathname.startsWith('/company'):
+                if (!userController.isAuthenticated(req)) {
+                    res.writeHead(302, { 'Location': '/login' });
+                    res.end();
+                    return;
+                } else if (!userController.isUserType(req, 'client')) {
+                    res.setHeader('Content-Type', 'text/html');
+                    res.end('<script>window.location.href = "/afterlog";</script>');
+                    return;
+                }
+                filePath = path.join(__dirname, '..', '..', 'public', 'Contents', 'company.html');
+                break;
             case pathname === '/myprojects':
                 if (!userController.isAuthenticated(req)) {
                     res.writeHead(302, { 'Location': '/login' });
@@ -137,6 +160,21 @@ function handleRequest(req, res) {
                 return;
             case pathname === '/api/projects':
                 companiesController.getProjects(req, res);
+                return;
+            case pathname === '/api/getFinishedPhases':
+                companiesController.getFinishedProjects(req, res);
+                return;
+            case pathname === '/api/getReviews':
+                companiesController.getReviews(req, res);
+                return;
+            case pathname.startsWith('/api/getCompanyDetails'):
+                companiesController.getCompanyDetails(req, res);
+                return;
+            case pathname.startsWith('/api/getCompanyPhases'):
+                companiesController.getCompanyPhases(req, res);
+                return;
+            case pathname.startsWith('/api/getCompanyReviews'):
+                companiesController.getCompanyReviews(req, res);
                 return;
             default:
                 filePath = path.join(__dirname, '..', '..', 'public', req.url);
@@ -183,6 +221,9 @@ function handleRequest(req, res) {
             case '/api/addoffer':
                 companiesController.addOffer(req, res);
                 break;
+            case '/api/submitReview':
+                companiesController.submitReview(req, res);
+                break;
             default:
                 res.writeHead(404, { 'Content-Type': 'text/plain' });
                 res.end('Not Found');
@@ -221,7 +262,32 @@ function handleRequest(req, res) {
                 res.writeHead(404, { 'Content-Type': 'text/plain' });
                 res.end('Not Found');
         }
-    } else {
+    }
+    else if (req.method === 'DELETE') {
+        const parsedUrl = url.parse(req.url, true);
+        const pathname = parsedUrl.pathname;
+
+        if (pathname.startsWith('/api/deleteReview')) {
+            if (!userController.isAuthenticated(req)) {
+                res.writeHead(302, { 'Location': '/login' });
+                res.end();
+                return;
+            } else if (!userController.isUserType(req, 'admin')) {
+                res.writeHead(401, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ error: 'Unauthorized' }));
+                return;
+            }
+
+            // Extract the review ID from the URL
+            const reviewId = pathname.split('/').pop();
+            console.log(reviewId);
+            companiesController.deleteReview(req, res, reviewId);
+        } else {
+            res.writeHead(404, { 'Content-Type': 'text/plain' });
+            res.end('Not Found');
+        }
+    }
+    else {
         res.writeHead(405, { 'Content-Type': 'text/plain' });
         res.end('Method Not Allowed');
     }

@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Company Details</title>
+    <link rel="stylesheet" href="/Contents/css/houses.css">
+</head>
+
+<body>
+    <div class="container">
+    <div class="container">
+        <div class="header">
+            <nav class="menu">
+                <ul>
+                    <li><a href="/myacc">My Account</a></li>
+                    <li><a href="/companies">Companies</a></li>
+                    <li><a href="/about">About</a></li>
+                </ul>
+                <div class="menu-toggle">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </nav>
+
+            <h2 id="companyTitle"></h2>
+
+            <a href="/afterlog" class="titlu">Pla<div class="cletter">c<div class="image"></div>
+                </div><span class="oletter">o</span></a>
+        </div>
+
+
+        <div class="middle">
+            <div class="content">
+                <h1>Motto: <q id="companyMotto"></q></h1>
+                <div class="description" id="description">
+                    <h3>Description</h3>
+                    <img id="companyImage" alt="Company Image">
+                    <p id="companyDescription"></p>
+                </div>
+
+                <div class="steps" id="steps">
+                    <h3>Phases</h3>
+                    <div id="phases-container"></div>
+                </div>
+
+                <div class="reviews" id="reviews">
+                    <h2>Reviews from our clients:</h2>
+                    <div class="review-container" id="reviews-container">
+                    </div>
+                </div>
+
+                <div class="contact" id="contact">
+                    <h3>Contact</h3>
+                    <p id="contactInfo"></p>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>Copyright &copy; Team PlaCo</p>
+        </div>
+    </div>
+
+    <script>
+        const companyName = window.location.pathname.split('/')[2];
+
+        async function fetchCompanyData() {
+            try {
+                const requestOptions = {
+                    method: 'GET',
+                    headers: { 'Content-Type': 'application/json' }
+                };
+
+                const [companyResponse, phasesResponse, reviewsResponse] = await Promise.all([
+                    fetch(`/api/getCompanyDetails/${companyName}`, requestOptions),
+                    fetch(`/api/getCompanyPhases/${companyName}`, requestOptions),
+                    fetch(`/api/getCompanyReviews/${companyName}`, requestOptions)
+                ]);
+
+                if (!companyResponse.ok || !phasesResponse.ok || !reviewsResponse.ok) {
+                    throw new Error('Network response was not ok');
+                }
+
+                const company = await companyResponse.json();
+                const phases = await phasesResponse.json();
+                const reviews = await reviewsResponse.json();
+
+                // Company Details
+                document.getElementById('companyTitle').textContent = company.company_name || 'Company Not Found';
+                document.getElementById('companyMotto').textContent = company.motto || '';
+                document.getElementById('companyDescription').textContent = company.description || '';
+
+                // Company Image
+                const companyImage = document.getElementById('companyImage');
+                if (company.data) {
+                    companyImage.src = `data:image/jpeg;base64,${btoa(String.fromCharCode(...new Uint8Array(company.data.data)))}`;
+                } else {
+                    companyImage.src = 'placeholder-image.jpg'; // Placeholder if no image
+                }
+
+                // Phases
+                const phasesContainer = document.getElementById('phases-container');
+                phases.forEach(phase => {
+                    const phaseDiv = document.createElement('div');
+                    phaseDiv.className = 'phase';
+
+                    // Phase Image
+                    const phaseImage = document.createElement('img');
+                    if (phase.data) {
+                        phaseImage.src = `data:image/jpeg;base64,${btoa(String.fromCharCode(...new Uint8Array(phase.data.data)))}`;
+                    } else {
+                        phaseImage.src = 'default-phase-image.jpg'; // Placeholder
+                    }
+                    phaseImage.alt = `Image for ${phase.description}`;
+                    phaseDiv.appendChild(phaseImage);
+
+                    // Other Phase details
+                    phaseDiv.innerHTML += `
+                        <h4>${phase.description || ''}</h4>
+                        <p>Start Date: ${phase.start_date || ''}</p>
+                        <p>End Date: ${phase.end_date || ''}</p>
+                        <p>State: ${phase.state || ''}</p>
+                        <p>Price: ${phase.price || ''}</p>
+                    `;
+                    phasesContainer.appendChild(phaseDiv);
+                });
+
+                // Reviews
+                const reviewsContainer = document.getElementById('reviews-container');
+                if (reviews.length > 0) {
+                    reviews.forEach(review => {
+                        const reviewDiv = document.createElement('div');
+                        reviewDiv.className = 'review';
+                        reviewDiv.innerHTML = `
+            <p>${review.description || ''}</p>
+            <p class="author">- ${review.client_id || ''}</p> 
+        `;
+                        reviewsContainer.appendChild(reviewDiv);
+                    });
+                } else {
+                    reviewsContainer.innerHTML = '<p>No reviews yet.</p>';
+                }
+
+                // Contact Information (assuming you are fetching this data)
+                document.getElementById('contactInfo').innerHTML = `
+    Tel: ${company.company_phone || ''}<br>
+    Address: ${company.company_address || ''}<br>
+    <!-- Add other contact details here -->
+`;
+
+            } catch (error) {
+                console.error('Error fetching company data:', error);
+                document.getElementById('companyTitle').textContent = 'Error loading company details';
+            }
+        }
+
+        fetchCompanyData();
+    </script>
+</body>
+
+</html>

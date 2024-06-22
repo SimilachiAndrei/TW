@@ -95,7 +95,7 @@
                                     if (project.name !== null) {
                                         const projectName = project.name || 'No name provided';
                                         const projectDescription = project.description || 'No description provided';
-                                        const projectStatus = project.phases && project.phases.every(phase => phase.state=='finished') ? 'finished' : 'in progress';
+                                        const projectStatus = project.phases && project.phases.every(phase => (phase.state=='finished' || phase.state =='reviewed')) ? 'finished' : 'in progress';
                                         const projectPhases = project.phases || [];
 
                                         const projectItem = document.createElement('div');
@@ -113,11 +113,9 @@
                                                             ${phase.description || 'No phase description provided'}
                                                             ${phase.company ? `<span>Company: ${phase.company.name}</span>` : ''}
                                                             ${phase.state === "notpending" ? `<button data-phase-id="${phase.id}">Licitate</button>` : ''}
-                                                            ${phase.state === "finished" ? `
-    <button>Review</button>
-    ${phase.images.length > 0 ? `<img src="data:image/jpeg;base64,${btoa(String.fromCharCode(...new Uint8Array(phase.images[0].data.data)))}" alt="Phase Image" />` : ''}
-` : ''}
-
+                                                            ${(phase.state === "finished"||phase.state==="reviewed") ? `
+                                                            ${phase.images.length > 0 ? `<img src="data:image/jpeg;base64,${btoa(String.fromCharCode(...new Uint8Array(phase.images[0].data.data)))}" alt="Phase Image" />` : ''}
+                                                            ` : ''}
                                                         </li>
                                                     `).join('')}
                                                 </ul>

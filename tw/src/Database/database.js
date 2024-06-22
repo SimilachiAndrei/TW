@@ -13,10 +13,12 @@ const databaseInitialization = async (pool) => {
     DROP TABLE IF EXISTS "clients" CASCADE;
     DROP TABLE IF EXISTS "users" CASCADE;
     DROP TABLE IF EXISTS "offers" CASCADE;
+    DROP TABLE IF EXISTS "reviews" CASCADE;
 
-`;
 
-        await client.query(dropTablesQuery);
+`; 
+
+        // await client.query(dropTablesQuery);
 
         const createUsersTableQuery = `
     CREATE TABLE IF NOT EXISTS "users"
@@ -95,8 +97,9 @@ const databaseInitialization = async (pool) => {
     CREATE TABLE IF NOT EXISTS "reviews"
     (
         "id"          SERIAL PRIMARY KEY,
-        "client_id"    INTEGER NOT NULL REFERENCES clients(user_id) ON DELETE CASCADE,
+        "client_id"   INTEGER NOT NULL REFERENCES clients(user_id) ON DELETE CASCADE,
         "company_id"  INTEGER NOT NULL REFERENCES companies(user_id) ON DELETE CASCADE,
+        "phase_id"  INTEGER NOT NULL REFERENCES phases(id) ON DELETE CASCADE,
         "description"        Text
     );`;
 

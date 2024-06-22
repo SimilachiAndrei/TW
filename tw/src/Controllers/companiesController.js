@@ -141,14 +141,161 @@ async function getProjects(req, res) {
 
 }
 
+async function getFinishedProjects(req, res) {
+    const user = userController.isAuthenticated(req);
+    console.log(user); // Log user details
+    if (!user || user.role == 'company') {
+        res.writeHead(401, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'Unauthorized' }));
+        return;
+    }
+
+    try {
+        const projects = await companyModel.getFinishedProjects(user.id);
+        // console.log(projects); // Log the projects retrieved
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify(projects));
+    } catch (error) {
+        console.error('Error in companiesController.getFinishedProjects:', error);
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'Internal Server Error' }));
+    }
+}
+
+async function getReviews(req, res) {
+    const user = userController.isAuthenticated(req);
+    console.log(user); // Log user details
+    if (!user || user.role !== 'admin') {
+        res.writeHead(401, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'Unauthorized' }));
+        return;
+    }
+
+    try {
+        const reviews = await companyModel.getReviews();
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify(reviews));
+    } catch (error) {
+        console.error('Error in companiesController.reviews:', error);
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'Internal Server Error' }));
+    }
+}
+
+
+async function submitReview(req, res) {
+    // Check if the user is authenticated and is a company
+    const user = userController.isAuthenticated(req);
+    if (!user || user.role !== 'client') {
+        res.writeHead(401, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'Unauthorized' }));
+        return;
+    }
+
+    try {
+        let body = '';
+        req.on('data', chunk => {
+            body += chunk.toString();
+        });
+
+        req.on('end', async () => {
+            try {
+                const formData = new URLSearchParams(body);
+                const data = Object.fromEntries(formData.entries());
+
+                const result = await companyModel.submitReview(data, user.id);
+
+                res.writeHead(200, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ message: 'Review added successfully' }));
+            } catch (error) {
+                console.error('Error adding offer:', error);
+                res.writeHead(400, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ error: error.message }));
+            }
+        });
+    } catch (error) {
+        console.error('Error in submitReview controller:', error);
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'Internal Server Error' }));
+    }
+}
+
+
+async function deleteReview(req, res, reviewId) {
+    try {
+        let body = '';
+        req.on('data', chunk => {
+            body += chunk.toString();
+        });
+
+        req.on('end', async () => {
+            try {
+                const result = await companyModel.deleteReview(reviewId);
+
+                res.writeHead(200, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ message: 'Review deleted successfully' }));
+            } catch (error) {
+                console.error('Error adding offer:', error);
+                res.writeHead(400, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ error: error.message }));
+            }
+        });
+    } catch (error) {
+        console.error('Error in deleteReview controller:', error);
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'Internal Server Error' }));
+    }
+}
 
 
 
+async function getCompanyDetails(req, res) {
+    try {
+        const fullPath = req.url;
+
+        // Split the path by '/' and get the last part
+        const pathParts = fullPath.split('/');
+        const companyName = pathParts[pathParts.length - 1];
+
+        const company = await companyModel.getCompanyDetails(companyName);
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify(company));
+    } catch (error) {
+        console.error('Error in getCompanyDetails:', error);
+    }
+}
+
+async function getCompanyPhases(req, res) {
+    try {
+        const fullPath = req.url;
+
+        // Split the path by '/' and get the last part
+        const pathParts = fullPath.split('/');
+        const companyName = pathParts[pathParts.length - 1];
+        const phases = await companyModel.getCompanyPhases(companyName);
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify(phases));
+    } catch (error) {
+        console.error('Error in getCompanyPhases:', error);
+    }
+}
 
 
+async function getCompanyReviews(req, res) {
+    try {
+        const fullPath = req.url;
 
-
-
+        // Split the path by '/' and get the last part
+        const pathParts = fullPath.split('/');
+        const companyName = pathParts[pathParts.length - 1];
+        console.log(companyName);
+        const reviews = await companyModel.getCompanyReviews(companyName);
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify(reviews));
+    } catch (error) {
+        console.error('Error in getCompanyReviews:', error);
+    }
+}
 
 
 
@@ -221,5 +368,6 @@ async function addPhasePicture(req, res) {
 
 module.exports = {
     getCompanies, addMotto, getCompany, updateProfilePicture, getAvailableLicitations,
-    addOffer, getProjects, addPhasePicture
+    addOffer, getProjects, addPhasePicture, getFinishedProjects, submitReview,
+    getReviews, deleteReview, getCompanyDetails, getCompanyReviews, getCompanyPhases
 };
