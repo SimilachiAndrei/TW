@@ -84,6 +84,7 @@ body {
 
 .menu ul li a {
     text-decoration: none;
+    color: var(--c4);
     padding: 10px 15px;
     transition: background-color 0.3s ease;
 }
