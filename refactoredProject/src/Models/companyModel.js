@@ -101,6 +101,35 @@ async function getCompanyReviews(companyName) {
     }
 }
 
+async function getPortofolioDetails(companyName) {
+    try {
+        const company = await databaseManager.getPortofolioDetails(companyName);
+        return company;
+    } catch (error) {
+        throw error;
+    }
+}
+
+async function getPortofolioPhases(companyName) {
+    try {
+        const phases = await databaseManager.getPortofolioPhases(companyName);
+        return phases;
+    } catch (error) {
+        throw error;
+    }
+}
+
+
+async function getPortofolioReviews(companyName) {
+    try {
+        const reviews = await databaseManager.getPortofolioReviews(companyName);
+        return reviews;
+    } catch (error) {
+        throw error;
+    }
+}
+
 
 module.exports = { getCompanies, addMotto, getCompany, getCompanyDetails, 
-    getCompanyPhases, getCompanyReviews, addName, addAddress, addPhone, addDescription };
+    getCompanyPhases, getCompanyReviews, addName, addAddress, addPhone, addDescription,
+    getPortofolioReviews, getPortofolioPhases, getPortofolioDetails };

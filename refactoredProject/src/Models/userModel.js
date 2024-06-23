@@ -32,4 +32,15 @@ async function changePassword(userId, oldPassword, newPassword) {
     }
 }
 
-module.exports = { addUser, getUser, changePassword};
+async function forgotPassword(username,newPassword) {
+    try {
+        const user = await databaseManager.forgotPassword(username, newPassword);
+        return user;
+    } catch (error) {
+        console.error('Error in userModel.getUser:', error);
+        throw error; 
+    }
+}
+
+
+module.exports = { addUser, getUser, changePassword, forgotPassword };

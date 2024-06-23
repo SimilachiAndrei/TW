@@ -10,6 +10,8 @@ const addReviewController = require('../Controllers/addReviewController');
 const myProjectsController = require('../Controllers/myProjectsController');
 const myoffersController = require('../Controllers/myoffersController');
 const licitationFormController = require('../Controllers/licitationFormController');
+const portofolioController = require('../Controllers/portofolioController');
+const loginController = require('../Controllers/loginController');
 
 
 function handleRequest(req, res) {
@@ -130,6 +132,18 @@ function handleRequest(req, res) {
             }
             filePath = path.join(__dirname, '..', '..', 'public', 'Contents', 'company.html');
             break;
+        case pathname.startsWith('/portofolio'):
+            if (!utils.isAuthenticated(req)) {
+                res.writeHead(302, { 'Location': '/login' });
+                res.end();
+                return;
+            } else if (!utils.isUserType(req, 'company')) {
+                res.setHeader('Content-Type', 'text/html');
+                res.end('<script>window.location.href = "/afterlog";</script>');
+                return;
+            }
+            filePath = path.join(__dirname, '..', '..', 'public', 'Contents', 'portofolio.html');
+            break;
         case pathname === '/myprojects':
             if (!utils.isAuthenticated(req)) {
                 res.writeHead(302, { 'Location': '/login' });
@@ -137,6 +151,16 @@ function handleRequest(req, res) {
                 return;
             }
             filePath = path.join(__dirname, '..', '..', 'public', 'Contents', 'myprojects.html');
+            break;
+        case pathname.startsWith('/reset-password'):
+            const token = new URL(req.url, `http://${req.headers.host}`).searchParams.get('token');
+            if (token && loginController.verifyResetToken(token)) {
+                filePath = path.join(__dirname, '..', '..', 'public', 'Contents', 'reset-password.html');
+            } else {
+                res.writeHead(302, { 'Location': '/login' });
+                res.end();
+                return;
+            }
             break;
         case pathname === '/api/user-data':
             myAccountController.getUserData(req, res);
@@ -175,6 +199,29 @@ function handleRequest(req, res) {
             return;
         case pathname.startsWith('/api/getCompanyReviews'):
             companyController.getCompanyReviews(req, res);
+            return;
+        case pathname.startsWith('/api/getPortofolioDetails'):
+            portofolioController.getPortofolioDetails(req, res);
+            return;
+        case pathname.startsWith('/api/getPortofolioPhases'):
+            portofolioController.getPortofolioPhases(req, res);
+            return;
+        case pathname.startsWith('/api/getPortofolioReviews'):
+            portofolioController.getPortofolioReviews(req, res);
+            return;
+        case pathname === '/api/getName':
+            const user = utils.isAuthenticated(req);
+            if (!user) {
+                res.writeHead(401, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ error: 'Unauthorized' }));
+                return;
+            } else if (utils.isUserType(req, 'admin')) {
+                res.writeHead(302, { 'Location': '/afterlog' });
+                res.end();
+                return;
+            }
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ username: user.username }));
             return;
         default:
             filePath = path.join(__dirname, '..', '..', 'public', req.url);

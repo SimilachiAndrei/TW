@@ -774,6 +774,63 @@ async function getCompanyReviews(companyName) {
     }
 }
 
+async function getPortofolioDetails(companyName) {
+    const query = `
+        SELECT u.username, c.id, c.user_id, c.company_name, c.company_address, c.company_phone, 
+               c.company_profile, c.motto, c.description, i.data
+        FROM companies c
+        JOIN users u ON u.id = c.user_id
+        LEFT JOIN images i ON i.profile_picture = c.user_id
+        WHERE u.username = $1
+    `;
+    try {
+        const result = await pool.query(query, [companyName]);
+        return result.rows[0];
+    } catch (error) {
+        console.error('Error retrieving company details:', error);
+        throw error;
+    }
+}
+
+
+async function getPortofolioPhases(companyName) {
+    const query = `
+        SELECT p.id, p.description, p.start_date, p.end_date, p.state, p.price , i.name,
+        i.data
+        FROM phases p
+        JOIN companies c ON p.company_id = c.user_id
+        LEFT JOIN images i ON i.phase_id = p.id
+        JOIN users u ON c.user_id = u.id
+        WHERE u.username = $1 and (p.state LIKE 'finished' or p.state LIKE 'reviewed')
+    `;
+    try {
+        const result = await pool.query(query, [companyName]);
+        return result.rows;
+    } catch (error) {
+        console.error('Error retrieving company phases:', error);
+        throw error;
+    }
+}
+
+
+async function getPortofolioReviews(companyName) {
+    const query = `
+        SELECT r.id, r.client_id, r.phase_id, r.description
+        FROM reviews r
+        JOIN companies c ON r.company_id = c.user_id
+        JOIN users u ON u.id = c.user_id
+        WHERE u.username = $1
+    `;
+    try {
+        const result = await pool.query(query, [companyName]);
+        return result.rows;
+    } catch (error) {
+        console.error('Error retrieving company reviews:', error);
+        throw error;
+    }
+}
+
+
 
 async function subcontract(id) {
     const query = `
@@ -825,11 +882,31 @@ async function changePassword(userId, oldPassword, newPassword) {
     }
 }
 
+async function forgotPassword(username, newPassword) {
+    const updateQuery = `
+        UPDATE users SET password = $1 WHERE username = $2;
+    `;
+
+    try {
+
+        const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+
+        // Update the password in the database
+        await pool.query(updateQuery, [hashedNewPassword, username]);
+
+        return { success: true, message: 'Password changed successfully' };
+    } catch (error) {
+        console.error('Error changing password:', error);
+        throw error;
+    }
+}
+
 module.exports = {
     getUserByUsername, addUser, getAllUserData, addPost,
     getCompanies, addMotto, getCompany, updateOrInsertProfilePicture, addLicitation,
     getAvailableLicitations, addOffer, getOffers, acceptOffer, getProjects,
     addPhasePicture, getFinishedProjects, submitReview, getReviews, deleteReview,
     getCompanyDetails, getCompanyPhases, getCompanyReviews, subcontract,
-    addPhone, addAddress, addDescription, addName, changePassword
+    addPhone, addAddress, addDescription, addName, changePassword, getPortofolioReviews,
+    getPortofolioDetails, getPortofolioPhases, forgotPassword
 };

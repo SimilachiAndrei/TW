@@ -1,14 +1,14 @@
 const utils = require('../utils/utils');
 const companyModel = require('../Models/companyModel');
 
-async function getCompanyDetails(req, res) {
+async function getPortofolioDetails(req, res) {
     try {
         const fullPath = req.url;
 
         // Split the path by '/' and get the last part
         const pathParts = fullPath.split('/');
         const companyName = pathParts[pathParts.length - 1];
-        const company = await companyModel.getCompanyDetails(companyName);
+        const company = await companyModel.getPortofolioDetails(companyName);
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify(company));
     } catch (error) {
@@ -16,14 +16,14 @@ async function getCompanyDetails(req, res) {
     }
 }
 
-async function getCompanyPhases(req, res) {
+async function getPortofolioPhases(req, res) {
     try {
         const fullPath = req.url;
 
         // Split the path by '/' and get the last part
         const pathParts = fullPath.split('/');
         const companyName = pathParts[pathParts.length - 1];
-        const phases = await companyModel.getCompanyPhases(companyName);
+        const phases = await companyModel.getPortofolioPhases(companyName);
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify(phases));
     } catch (error) {
@@ -32,14 +32,14 @@ async function getCompanyPhases(req, res) {
 }
 
 
-async function getCompanyReviews(req, res) {
+async function getPortofolioReviews(req, res) {
     try {
         const fullPath = req.url;
 
         // Split the path by '/' and get the last part
         const pathParts = fullPath.split('/');
         const companyName = pathParts[pathParts.length - 1];
-        const reviews = await companyModel.getCompanyReviews(companyName);
+        const reviews = await companyModel.getPortofolioReviews(companyName);
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify(reviews));
     } catch (error) {
@@ -47,4 +47,4 @@ async function getCompanyReviews(req, res) {
     }
 }
 
-module.exports = { getCompanyReviews, getCompanyDetails, getCompanyPhases }
+module.exports = { getPortofolioReviews, getPortofolioDetails, getPortofolioPhases }
