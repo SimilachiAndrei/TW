@@ -14,8 +14,10 @@
     "bcrypt": "^5.1.1",
     "bcryptjs": "^2.4.3",
     "cookie": "^0.6.0",
+    "dotenv": "^16.4.5",
     "jsonwebtoken": "^9.0.2",
     "multer": "^1.4.5-lts.1",
+    "nodemailer": "^6.9.14",
     "pg": "^8.11.5",
     "sequelize": "^6.37.3"
   }
