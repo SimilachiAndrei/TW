@@ -129,9 +129,7 @@
         if (company.image && company.image.data) {
             const base64Image = btoa(String.fromCharCode.apply(null, company.image.data.data));
             companyImage.src = `data:image/jpeg;base64,${base64Image}`;
-        } else {
-            companyImage.src = '/Contents/css/images/default.jpg'; // Fallback image
-        }
+        } 
 
         const companyName = document.createTextNode(company.company.name);
 

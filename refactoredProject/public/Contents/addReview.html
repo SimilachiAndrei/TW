@@ -64,6 +64,7 @@
             <p>Copyright &copy; Team PlaCo</p>
         </div>
     </div>
+    <script src="/Contents/scripts/toggle.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', async () => {
             const token = localStorage.getItem('jwtToken'); // Assuming you store the JWT in localStorage
@@ -147,14 +148,16 @@
 
                     if (response.ok) {
                         alert('Review submitted successfully');
-                        // Clear form
                         event.target.reset();
+                        location.reload();
                     } else {
+                        location.reload();
                         throw new Error('Failed to submit review');
                     }
                 } catch (error) {
                     console.error('Error submitting review:', error);
                     alert('Failed to submit review. Please try again.');
+                    location.reload();
                 }
             });
         });

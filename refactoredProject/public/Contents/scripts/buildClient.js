@@ -76,9 +76,10 @@ function buildClient() {             // Fetch company details for companies
                             });
                             if (response.ok) {
                                 console.log('Licitation added successfully');
-                                // You can add additional logic here if needed
+                                location.reload();
                             } else {
                                 console.error('Failed to add licitation');
+                                location.reload();
                             }
                         } catch (error) {
                             console.error('Error adding licitation:', error);

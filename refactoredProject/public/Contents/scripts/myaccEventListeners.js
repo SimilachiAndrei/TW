@@ -3,7 +3,7 @@ function setupCompanyFormListeners() {
         event.preventDefault();
 
         const formData = new FormData(this);
-        const motto = formData.get('new-motto'); // Assuming 'motto' is the input name
+        const motto = formData.get('new-motto');
         console.log(motto)
         const token = localStorage.getItem('jwtToken');
 
@@ -22,14 +22,12 @@ function setupCompanyFormListeners() {
                 return response.json();
             })
             .then(data => {
-                // Handle successful response
                 console.log('PUT request successful:', data);
-                // Optionally, update UI or notify user
+                location.reload();
             })
             .catch(error => {
-                // Handle errors
                 console.error('Error in PUT request:', error);
-                // Optionally, update UI to show error
+                location.reload();
             });
     });
 
@@ -54,11 +52,17 @@ function setupCompanyFormListeners() {
 
                 if (response.ok) {
                     console.log('Profile picture updated successfully');
+                    location.reload();
+
                 } else {
                     console.error('Error updating profile picture:', response.statusText);
+                    location.reload();
+
                 }
             } catch (error) {
                 console.error('Error updating profile picture:', error);
+                location.reload();
+
             }
         });
     });
@@ -88,9 +92,11 @@ function setupCompanyFormListeners() {
             })
             .then(data => {
                 console.log('PUT request successful:', data);
+                location.reload();
             })
             .catch(error => {
                 console.error('Error in PUT request:', error);
+                location.reload();
             });
     });
 
@@ -119,9 +125,11 @@ function setupCompanyFormListeners() {
             })
             .then(data => {
                 console.log('PUT request successful:', data);
+                location.reload();
             })
             .catch(error => {
                 console.error('Error in PUT request:', error);
+                location.reload();
             });
     });
 
@@ -150,9 +158,11 @@ function setupCompanyFormListeners() {
             })
             .then(data => {
                 console.log('PUT request successful:', data);
+                location.reload();
             })
             .catch(error => {
                 console.error('Error in PUT request:', error);
+                location.reload();
             });
     });
 
@@ -180,9 +190,11 @@ function setupCompanyFormListeners() {
             })
             .then(data => {
                 console.log('PUT request successful:', data);
+                location.reload();
             })
             .catch(error => {
                 console.error('Error in PUT request:', error);
+                location.reload();
             });
     });
 }

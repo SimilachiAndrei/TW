@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         // Check if data is an array
         if (!Array.isArray(data)) {
-            throw new Error('Data is not an array');
+            return ;
         }
 
         const licitationList = document.getElementById('licitationList');
@@ -54,15 +54,16 @@ document.addEventListener('DOMContentLoaded', async () => {
                     });
                     
                     if (!acceptResponse.ok) {
+                        location.reload();
                         throw new Error('Failed to accept offer');
                     }
                     
-                    // Optionally, you can update UI or show a success message
                     acceptButton.textContent = 'Offer Accepted';
                     acceptButton.disabled = true;
+                    location.reload();
                 } catch (error) {
                     console.error('Error accepting offer:', error);
-                    // Handle error scenario, show error message, etc.
+                    location.reload();
                 }
             });
         });

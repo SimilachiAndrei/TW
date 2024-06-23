@@ -33,7 +33,7 @@
                     <h1>Motto: <q id="companyMotto"></q></h1>
                     <div class="description" id="description">
                         <h2 id="companyTitle"></h2>
-                        <img id="companyImage" alt="Company Image">
+                        <img id="companyImage" >
                         <h3>Description</h3>
                         <p id="companyDescription"></p>
                     </div>
@@ -128,8 +128,6 @@
                     const companyImage = document.getElementById('companyImage');
                     if (company.data) {
                         companyImage.src = `data:image/jpeg;base64,${btoa(String.fromCharCode(...new Uint8Array(company.data.data)))}`;
-                    } else {
-                        companyImage.src = 'placeholder-image.jpg'; // Placeholder if no image
                     }
         
                     // Phases

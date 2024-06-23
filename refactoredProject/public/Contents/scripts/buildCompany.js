@@ -57,7 +57,7 @@ function buildCompany() {             // Fetch company details for companies
                                           <p><strong>Profile Picture:</strong></p>
                                           ${data.image && data.image.data ? `<img src="data:image/png;base64,${btoa(String.fromCharCode.apply(null, new Uint8Array(data.image.data.data)))}" alt="${data.image.name}" />` : '<p>No profile picture available</p>'}
                                           <form id="profilePictureForm">
-                                            <input type="file" id="profilePictureInput" name="profilePicture" accept="image/*">
+                                            <input type="file" id="profilePictureInput" name="profilePicture" accept="image/*" required>
                                             <button type="submit">Update Profile Picture</button>
                                         </form>
                                       </div>

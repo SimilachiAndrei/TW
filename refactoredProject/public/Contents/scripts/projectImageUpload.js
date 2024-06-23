@@ -57,14 +57,14 @@ document.addEventListener('DOMContentLoaded', async () => {
 
                 if (uploadResponse.ok) {
                     console.log('Image uploaded successfully');
-                    // Optionally, update UI or show a success message
+                    location.reload();
                 } else {
                     console.error('Failed to upload image');
-                    // Handle error scenario, show error message, etc.
+                    location.reload();
                 }
             } catch (error) {
                 console.error('Error uploading image:', error);
-                // Handle error scenario, show error message, etc.
+                location.reload();
             }
         });
 
