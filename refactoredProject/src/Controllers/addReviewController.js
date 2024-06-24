@@ -43,7 +43,7 @@ async function submitReview(req, res) {
 
 async function getFinishedProjects(req, res) {
     const user = utils.isAuthenticated(req);
-    if (!user || user.role == 'company') {
+    if (!user || user.role !== 'client') {
         res.writeHead(401, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ error: 'Unauthorized' }));
         return;

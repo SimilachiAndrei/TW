@@ -68,7 +68,7 @@ async function getCompany(id) {
         const response = await databaseManager.getCompany(id);
         return response;
     } catch (error) {
-        console.error('Error in companyModel.addMotto:', error);
+        console.error('Error in companyModel.getCompany:', error);
         throw error;
     }
 }

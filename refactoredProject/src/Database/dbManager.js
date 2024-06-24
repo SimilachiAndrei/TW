@@ -127,13 +127,13 @@ async function addOffer(data, companyId) {
         const phaseResult = await pool.query(phaseQuery, [phase_id]);
 
         if (phaseResult.rows.length === 0) {
-            throw new Error('Phase not found');
+            return 'Phase not found';
         }
 
         const phaseState = phaseResult.rows[0].state;
 
         if (phaseState !== 'pending') {
-            throw new Error('Cannot add offer for phases with state other than pending');
+            return 'Cannot add offer for phases with state other than pending';
         }
 
         // Insert the offer into the offers table
@@ -563,14 +563,15 @@ async function acceptOffer(offerId) {
                     o.price
                 FROM 
                     offers o
+                LEFT JOIN phases p ON p.id = o.phase_id
                 WHERE 
-                    o.id = $1;
+                    o.id = $1 and p.state LIKE 'pending';
             `;
             const offerResult = await pool.query(offerQuery, [offerId]);
             const offer = offerResult.rows[0];
 
             if (!offer) {
-                throw new Error('Offer not found');
+                return "Offer or phase not found!";
             }
 
             // Update phases table
@@ -646,15 +647,26 @@ async function addPhasePicture(phaseId, fileName, fileData) {
     try {
         const query = `
             INSERT INTO images (name, phase_id, data)
-            VALUES ($1, $2, $3)
+            VALUES ($1, $2, $3) ON CONFLICT (phase_id) DO UPDATE
+            SET data = EXCLUDED.data
         `;
         const values = [fileName, phaseId, fileData];
         await pool.query(query, values);
 
+        const currentDate = new Date();
+
+        const year = currentDate.getFullYear();
+        const month = String(currentDate.getMonth() + 1).padStart(2, '0');
+        const day = String(currentDate.getDate()).padStart(2, '0');
+        const formattedDate = `${year}-${month}-${day}`;
+        const endDate = formattedDate;
+
+
+
         const query2 = `
-            UPDATE phases SET state = 'finished' WHERE id = $1
+            UPDATE phases SET state = 'finished', end_date = $2 WHERE id = $1
         `;
-        const values2 = [phaseId];
+        const values2 = [phaseId,endDate];
         await pool.query(query2, values2);
     } catch (error) {
         console.error('Error in companyModel.addPhasePicture:', error);
@@ -669,11 +681,14 @@ async function submitReview(data, userId) {
     const { company_id, phase_id, description } = dates;
     try {
         // Insert the offer into the offers table client_id | company_id | phase_id | description
+        const selectQuery = `SELECT state FROM phases WHERE id = $1;`;
+
         const insertQuery = `
             INSERT INTO reviews (client_id, company_id, phase_id, description)
             VALUES ($1, $2, $3, $4)
             RETURNING id`;
-
+        const state = (await pool.query(selectQuery, [phase_id])).rows[0];
+        if (state == 'reviewed') return "Phase already reviewed!";
         const values = [userId, company_id, phase_id, description];
         const result = await pool.query(insertQuery, values);
 

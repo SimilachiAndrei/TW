@@ -4,7 +4,7 @@ const utils = require('../utils/utils');
 
 async function getOffers(req, res) {
     const user = utils.isAuthenticated(req);
-    if (!user) {
+    if (!user|| user.role !== 'client') {
         res.writeHead(401, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ error: 'Unauthorized' }));
         return;
@@ -29,7 +29,7 @@ async function getOffers(req, res) {
 
 async function acceptOffer(req, res) {
     const user = utils.isAuthenticated(req);
-    if (!user) {
+    if (!user || user.role !== 'client') {
         res.writeHead(401, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ error: 'Unauthorized' }));
         return;

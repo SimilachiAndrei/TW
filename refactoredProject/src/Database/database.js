@@ -18,7 +18,7 @@ const databaseInitialization = async (pool) => {
 
 `; 
 
-        // await client.query(dropTablesQuery);
+        await client.query(dropTablesQuery);
 
         const createUsersTableQuery = `
     CREATE TABLE IF NOT EXISTS "users"
@@ -87,7 +87,7 @@ const databaseInitialization = async (pool) => {
     CREATE TABLE IF NOT EXISTS "images"
     (
         "id"          SERIAL PRIMARY KEY,
-        "phase_id"    INTEGER REFERENCES phases(id) ON DELETE CASCADE,
+        "phase_id"    INTEGER UNIQUE REFERENCES phases(id) ON DELETE CASCADE,
         "name"        VARCHAR(255),
         "data"        BYTEA,
         "profile_picture" INTEGER UNIQUE REFERENCES users(id) ON DELETE CASCADE

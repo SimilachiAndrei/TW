@@ -46,7 +46,10 @@ function handleRequest(req, res) {
                 res.end();
                 return;
             }
-            filePath = path.join(__dirname, '..', '..', 'public', 'Contents', 'myacc.html');
+            else if (!utils.isUserType(req, 'admin')) {
+                filePath = path.join(__dirname, '..', '..', 'public', 'Contents', 'myacc.html');
+            }
+            else filePath = path.join(__dirname, '..', '..', 'public', 'Contents', 'afterlog.html');
             break;
         case pathname === '/post':
             if (!utils.isAuthenticated(req)) {
@@ -54,7 +57,10 @@ function handleRequest(req, res) {
                 res.end();
                 return;
             }
-            filePath = path.join(__dirname, '..', '..', 'public', 'Contents', 'post.html');
+            else if (!utils.isUserType(req, 'client')) {
+                filePath = path.join(__dirname, '..', '..', 'public', 'Contents', 'afterlog.html');
+            }
+            else filePath = path.join(__dirname, '..', '..', 'public', 'Contents', 'post.html');
             break;
         case pathname === '/reviews':
             if (!utils.isAuthenticated(req)) {
@@ -62,7 +68,10 @@ function handleRequest(req, res) {
                 res.end();
                 return;
             }
-            filePath = path.join(__dirname, '..', '..', 'public', 'Contents', 'addReview.html');
+            else if (!utils.isUserType(req, 'client')) {
+                filePath = path.join(__dirname, '..', '..', 'public', 'Contents', 'afterlog.html');
+            }
+            else filePath = path.join(__dirname, '..', '..', 'public', 'Contents', 'addReview.html');
             break;
         case pathname === '/about':
             if (!utils.isAuthenticated(req)) {
@@ -148,6 +157,11 @@ function handleRequest(req, res) {
             if (!utils.isAuthenticated(req)) {
                 res.writeHead(302, { 'Location': '/login' });
                 res.end();
+                return;
+            }
+            else if (!utils.isUserType(req, 'company')) {
+                res.setHeader('Content-Type', 'text/html');
+                res.end('<script>window.location.href = "/afterlog";</script>');
                 return;
             }
             filePath = path.join(__dirname, '..', '..', 'public', 'Contents', 'myprojects.html');

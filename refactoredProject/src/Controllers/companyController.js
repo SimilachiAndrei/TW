@@ -2,6 +2,12 @@ const utils = require('../utils/utils');
 const companyModel = require('../Models/companyModel');
 
 async function getCompanyDetails(req, res) {
+    const user = utils.isAuthenticated(req);
+    if (!user || user.role !== 'client') {
+        res.writeHead(401, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'Unauthorized' }));
+        return;
+    }
     try {
         const fullPath = req.url;
 
@@ -17,6 +23,12 @@ async function getCompanyDetails(req, res) {
 }
 
 async function getCompanyPhases(req, res) {
+    const user = utils.isAuthenticated(req);
+    if (!user || user.role !== 'client') {
+        res.writeHead(401, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'Unauthorized' }));
+        return;
+    }
     try {
         const fullPath = req.url;
 
@@ -33,6 +45,12 @@ async function getCompanyPhases(req, res) {
 
 
 async function getCompanyReviews(req, res) {
+    const user = utils.isAuthenticated(req);
+    if (!user || user.role !== 'client') {
+        res.writeHead(401, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'Unauthorized' }));
+        return;
+    }
     try {
         const fullPath = req.url;
 

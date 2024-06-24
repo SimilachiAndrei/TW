@@ -22,6 +22,12 @@ async function getReviews(req, res) {
 
 
 async function deleteReview(req, res, reviewId) {
+    const user = utils.isAuthenticated(req);
+    if (!user || user.role !== 'admin') {
+        res.writeHead(401, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'Unauthorized' }));
+        return;
+    }
     try {
         let body = '';
         req.on('data', chunk => {

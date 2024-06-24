@@ -2,6 +2,12 @@ const utils = require('../utils/utils');
 const companyModel = require('../Models/companyModel');
 
 async function getPortofolioDetails(req, res) {
+    const user = utils.isAuthenticated(req);
+    if (!user || user.role !== 'company') {
+        res.writeHead(401, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'Unauthorized' }));
+        return;
+    }
     try {
         const fullPath = req.url;
 
@@ -17,6 +23,12 @@ async function getPortofolioDetails(req, res) {
 }
 
 async function getPortofolioPhases(req, res) {
+    const user = utils.isAuthenticated(req);
+    if (!user || user.role !== 'company') {
+        res.writeHead(401, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'Unauthorized' }));
+        return;
+    }
     try {
         const fullPath = req.url;
 
@@ -33,6 +45,12 @@ async function getPortofolioPhases(req, res) {
 
 
 async function getPortofolioReviews(req, res) {
+    const user = utils.isAuthenticated(req);
+    if (!user || user.role !== 'company') {
+        res.writeHead(401, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'Unauthorized' }));
+        return;
+    }
     try {
         const fullPath = req.url;
 
