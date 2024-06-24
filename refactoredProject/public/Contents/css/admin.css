@@ -19,7 +19,6 @@ body {
     flex-direction: column;
 }
 
-
 .header {
     position: fixed;
     top: 0;
@@ -29,9 +28,9 @@ body {
     justify-content: space-between;
     align-items: center;
     background-color: var(--c2);
-    padding: 1rem;
     flex-shrink: 0;
     z-index: 1000;
+
 }
 
 .titlu {
@@ -68,7 +67,7 @@ body {
 
 .menu ul li a {
     text-decoration: none;
-    color: #333;
+    color: var(--c4);
     padding: 10px 15px;
     transition: background-color 0.3s ease;
 }
@@ -98,7 +97,7 @@ body {
     }
 }
 
-.ref {
+.ref{
     display: none;
 }
 
@@ -150,46 +149,9 @@ body {
     border-radius: 10px;
 }
 
-.content p {
+.content p{
     max-width: 60em;
 }
-
-
-.photos,
-.reviews,
-.contact {
-    margin-bottom: 2rem;
-}
-
-.description img,
-.models img,
-.photos img,
-.contact img {
-    max-width: 100%;
-    height: auto;
-    border-radius: 10px;
-    margin-top: 1rem;
-}
-
-.reviews {
-    margin-top: 2rem;
-}
-
-.review-container {
-    position: relative;
-    height: 150px;
-    overflow: hidden;
-}
-
-.review {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    opacity: 0;
-    transition: opacity 0.5s ease-in-out;
-}
-
 
 @media (max-width: 768px) {
 
@@ -209,6 +171,7 @@ body {
         right: 0;
         max-height: calc(100vh - 100%);
         overflow-y: scroll;
+
     }
 
     .menu ul li {
@@ -234,8 +197,7 @@ body {
     .menu.active ul {
         display: flex;
     }
-
-    .ref {
+    .ref{
         display: block;
     }
 }
@@ -250,49 +212,32 @@ body {
         flex-direction: column;
     }
 
+    .post {
+        width: 100%;
+    }
+
 }
 
-h1 {
+h1{
+    color: var(--c5)
+}
+
+
+h2{
     color: var(--c5);
 }
 
-h2 {
-    color: var(--c5);
-}
-
-h3 {
+h3{
     color: var(--c1);
     text-align: left;
 }
 
-h4 {
+h4{
     color: var(--c3);
     text-align: left;
 }
 
-ol,
-ul {
+ol, ul{
     text-align: left;
     align-items: center;
-}
-
-li img {
-    max-width: 100px;
-    margin: 5px;
-    border-radius: 5px;
-}
-
-/* Add rounded corners to the select boxes and comments box */
-select, textarea {
-    border-radius: 20px;
-    padding: 0.5rem;
-    border: 1px solid var(--c4);
-    width: 100%;
-    box-sizing: border-box;
-    margin-bottom: 1rem;
-}
-
-textarea {
-    resize: vertical;
-    min-height: 100px;
 }

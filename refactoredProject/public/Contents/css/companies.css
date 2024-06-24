@@ -81,9 +81,10 @@ body {
     margin-bottom: 10px;
 }
 
+
 .menu ul li a {
     text-decoration: none;
-    color: var(--c4);
+    color: #333;
     padding: 10px 15px;
     transition: background-color 0.3s ease;
 }
@@ -92,6 +93,8 @@ body {
     background-color: #f0f0f0;
     border-radius: 5px;
 }
+
+
 
 .menu-toggle {
     display: none;
@@ -170,24 +173,6 @@ body {
     max-width: 60em;
 }
 
-.description,
-.steps,
-.models,
-.photos,
-.reviews,
-.contact {
-    margin-bottom: 2rem;
-}
-
-.description img,
-.models img,
-.photos img,
-.contact img {
-    max-width: 100%;
-    height: auto;
-    border-radius: 10px;
-    margin-top: 1rem;
-}
 
 .reviews {
     margin-top: 2rem;
@@ -334,12 +319,12 @@ ul {
 
 .filter-option {
     margin-right: 20px;
-    color: var(--c4);
+    color: #333;
 }
 
 .filter-option select {
 
-    color: var(--c4);
+    color: #333;
     border: none;
     padding: 5px 10px;
     border-radius: 10px;

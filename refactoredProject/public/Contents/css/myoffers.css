@@ -19,7 +19,6 @@ body {
     flex-direction: column;
 }
 
-
 .header {
     position: fixed;
     top: 0;
@@ -46,6 +45,23 @@ body {
 .buttons {
     display: flex;
     gap: 1rem;
+}
+
+.post {
+    padding: 0.5rem 1rem;
+    background-color: transparent;
+    color: var(--c5);
+    border: none;
+    outline: none;
+    border-radius: 20px;
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+.post:hover {
+    background-color: var(--c1);
+    transition: 1s;
+    color: white;
 }
 
 .menu {
@@ -98,10 +114,6 @@ body {
     }
 }
 
-.ref {
-    display: none;
-}
-
 .oletter {
     display: inline-block;
     animation: spin 2s infinite linear;
@@ -138,61 +150,100 @@ body {
     background: linear-gradient(-45deg, var(--c5), var(--c4));
     flex-grow: 1;
     display: flex;
+    flex-direction: column; 
     justify-content: center;
     align-items: center;
     padding-top: 80px;
 }
 
-.content {
+.middle .content,
+.middle .upload-form {
+    text-align: center;
+    background-color: rgba(255, 255, 255, 0.8);
+    padding: 1rem;
+    border-radius: 10px;
+    width: 80%; 
+    margin-bottom: 1rem; 
+}
+
+.content, .upload-form {
+    width: 90%;
+    max-width: 600px;
+    margin: 0 auto;
     text-align: center;
     background-color: rgba(255, 255, 255, 0.8);
     padding: 1rem;
     border-radius: 10px;
 }
 
-.content p {
-    max-width: 60em;
-}
-
-
-.photos,
-.reviews,
-.contact {
+.construct1,
+.construct2 {
     margin-bottom: 2rem;
 }
 
-.description img,
-.models img,
-.photos img,
-.contact img {
+.construct1 img,
+.construct2 img {
     max-width: 100%;
     height: auto;
     border-radius: 10px;
     margin-top: 1rem;
 }
 
-.reviews {
-    margin-top: 2rem;
+.post-container {
+    display: grid;
+    grid-gap: 1rem;
 }
 
-.review-container {
-    position: relative;
-    height: 150px;
-    overflow: hidden;
+.post-item {
+    background-color: #fff;
+    padding: 1rem;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
-.review {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    opacity: 0;
-    transition: opacity 0.5s ease-in-out;
+.post-item img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 5px;
+    margin-top: 1rem;
 }
 
+.settings-container {
+    width: 50em;
+    margin: 0 auto;
+}
+
+.settings-container form {
+    display: flex;
+    flex-direction: column;
+}
+
+.settings-container label {
+    margin-bottom: 0.5rem;
+}
+
+.settings-container input[type="password"] {
+    padding: 0.5rem;
+    margin-bottom: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.settings-container button[type="submit"] {
+    padding: 0.5rem;
+    background-color: var(--c2);
+    color: #fff;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: 0.3s ease;
+}
+
+.settings-container button[type="submit"]:hover {
+    background-color: var(--c1);
+}
 
 @media (max-width: 768px) {
-
     .titlu {
         font-size: 2rem;
     }
@@ -235,13 +286,12 @@ body {
         display: flex;
     }
 
-    .ref {
-        display: block;
+    .settings-container {
+        width: 30em;
     }
 }
 
 @media (max-width: 480px) {
-
     .titlu {
         font-size: 1.5rem;
     }
@@ -250,49 +300,11 @@ body {
         flex-direction: column;
     }
 
-}
-
-h1 {
-    color: var(--c5);
-}
-
-h2 {
-    color: var(--c5);
-}
-
-h3 {
-    color: var(--c1);
-    text-align: left;
-}
-
-h4 {
-    color: var(--c3);
-    text-align: left;
-}
-
-ol,
-ul {
-    text-align: left;
-    align-items: center;
-}
-
-li img {
-    max-width: 100px;
-    margin: 5px;
-    border-radius: 5px;
-}
-
-/* Add rounded corners to the select boxes and comments box */
-select, textarea {
-    border-radius: 20px;
-    padding: 0.5rem;
-    border: 1px solid var(--c4);
-    width: 100%;
-    box-sizing: border-box;
-    margin-bottom: 1rem;
-}
-
-textarea {
-    resize: vertical;
-    min-height: 100px;
+    .post {
+        width: 100%;
+    }
+    .settings-container {
+        width: 15em;
+        margin: 0 auto;
+    }
 }

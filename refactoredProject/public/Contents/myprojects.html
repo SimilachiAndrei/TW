@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Project Image Upload</title>
-    <link rel="stylesheet" href="/Contents/css/myaccount.css">
+    <link rel="stylesheet" href="/Contents/css/myproject.css">
     <link rel="icon" type="image/x-icon" href="/Contents/css/images/favicon.ico">
 </head>
 
@@ -23,9 +23,6 @@
                     <span></span>
                 </div>
             </nav>
-            <!-- <div class="buttons">
-                <button class="post" onclick="location.href = '/post';">Post</button>
-            </div> -->
             <a href="/afterlog" class="titlu">Pla<div class="cletter">c<div class="image"></div>
                 </div><span class="oletter">o</span></a>
         </div>
@@ -38,13 +35,19 @@
                 <div class="upload-form">
                     <h2>Upload Images</h2>
                     <form id="imageUploadForm">
-                        <label for="phaseId">Select Project Phase:</label>
-                        <select id="phaseId" name="phaseId" required>
-                            <!-- Options will be dynamically populated -->
-                        </select>
-                        <label for="imageFile">Choose Image File:</label>
-                        <input type="file" id="imageFile" name="imageFile" accept="image/*" required>
-                        <button type="submit">Finish Project</button>
+                        <div class="field">
+                            <label for="phaseId">Select Project Phase:</label>
+                            <select id="phaseId" name="phaseId" required>
+                                <!-- Options will be dynamically populated -->
+                            </select>
+                        </div>
+                        <div class="field">
+                            <label for="imageFile">Choose Image File:</label>
+                            <input type="file" id="imageFile" name="imageFile" accept="image/*" required>
+                        </div>
+                        <div class="field">
+                            <button type="submit">Finish Project</button>
+                        </div>
                     </form>
                     <button id="renounceProjectButton">Renounce Project</button>
                 </div>
