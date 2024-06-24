@@ -62,12 +62,6 @@ async function getProjects(req, res) {
 
 
 async function subcontract(res,phaseId) {
-    const user = utils.isAuthenticated(req);
-    if (!user || user.role !== 'company') {
-        res.writeHead(401, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ error: 'Unauthorized' }));
-        return;
-    }
     try {
         const response = await phaseModel.subcontract(phaseId);
         res.writeHead(200, { 'Content-Type': 'application/json' });
